@@ -55,8 +55,6 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 async function checkUser(data) {
-    // console.log('checkUser(data) ---')
-    // console.log(data)
     return new Promise((resolve, reject) => {
         callDb.findOne(data.id)
             .then((idCheck) => {
