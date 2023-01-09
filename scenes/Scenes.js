@@ -6,11 +6,12 @@ async function setState (input,data) {
 }
 
 async function checkInput (data) {
-    const regex = /^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-(2[1-4])$/ // Регулярное выражение для проверки формата
+    // const regex = /^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-(2[1-4])$/
+    const regex = /^(0?[1-9]|[12][0-9]|3[01])-(0?[1-9]|1[0-2])-(20(20|21|22|23|24))$/
     if (regex.test(data)) {
         return ["", true]
     } else {
-        const message = "Похоже, Вы ввели дату неправильно"
+        const message = "Похоже, формат даты неправильный"
         return [message,false]
     }
 
@@ -66,7 +67,7 @@ class SceneGenerator {
     GenAgeScene () {
         const age = new BaseScene('age')
         age.enter(async (ctx) => {
-            await ctx.replyWithHTML(`Введите, пожалуйста, дату рождения ребенка в формате ДД-ММ-ГГ \n (Пример: <b>12-08-22</b>)`
+            await ctx.replyWithHTML(`Введите, пожалуйста, дату рождения ребенка в формате ДД-ММ-ГГГГ \n (Пример: <b>12-08-2022</b>)`
              )
         })
         age.on('text', async (ctx) => {
@@ -75,7 +76,7 @@ class SceneGenerator {
                     await setState('birthday_telegram', ctx.message.text)
                     await ctx.scene.enter('name')
                 } else {
-                    await ctx.telegram.sendMessage( state.chatId, `${checkData[0]}\n Требуемый формат ДД-ММ-ГГ`)
+                    await ctx.telegram.sendMessage( state.chatId, `${checkData[0]}\n Требуемый формат ДД-ММ-ГГГГ`)
                     await ctx.scene.reenter()
                 }
         })

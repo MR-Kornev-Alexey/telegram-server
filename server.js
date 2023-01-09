@@ -1,11 +1,13 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const { Telegraf, Markup, Scenes, session} = require('telegraf');
-const BOT_TOKEN = `5815175979:AAGXqlzqxeq9LCigysbmxrqmhVrsD76LGos`
+const {Telegraf, Markup, Scenes, session} = require('telegraf');
+// const BOT_TOKEN = `5815175979:AAGXqlzqxeq9LCigysbmxrqmhVrsD76LGos` //helen
+const BOT_TOKEN = "5739415913:AAG0e8F6BtVEFHusoIRix8wvkKN23RZpcsc"
 const bot = new Telegraf(BOT_TOKEN);
-const { createStore } = require('redux');
+const {createStore} = require('redux');
 const SceneGenerator = require('./scenes/Scenes')
+const help = require("./common/help")
 const curScene = new SceneGenerator()
 const ageScene = curScene.GenAgeScene()
 const nameScene = curScene.GenNameScene()
@@ -14,30 +16,30 @@ const emailScene = curScene.GenEmailScene()
 const callDb = require("./controllers/tutorial.controller")
 
 
-
 // Редьюсер, который обновляет свойство 'data' состояния хранилища
-function dataReducer(state = { data: [] }, action) {
+function dataReducer(state = {data: []}, action) {
     switch (action.type) {
 
         case 'ADD_DATA':
-            return { ...state, data: [...state.data, action.payload] };
+            return {...state, data: [...state.data, action.payload]};
         default:
             return state;
     }
 }
+
 const app = express();
 
 const store = createStore(dataReducer);
-const checkScene = curScene.GenCheckScene(store, function(id) {
-// Код, который будет выполнен при вызове функции callback()
-callDb.updateUser(id, store.getState().data).then(result => {
-        // Здесь result содержит информацию о том, сколько строк было обновлено
-       if(result === 123) {
-            // console.log("Успешное обновление");
-            bot.telegram.sendMessage(id, `Успешное обновление`).then(r =>{})
-            bot.telegram.sendSticker(id, 'CAACAgIAAxkBAAEHK4pjuoKkGSffpgZH7FAMCxqOvdItxgACCh0AAsGoIEkIjTf-YvDReC0E').then(r => {})
+const checkScene = curScene.GenCheckScene(store, function (id) {
+    callDb.updateUser(id, store.getState().data).then(result => {
+        if (result === 123) {
+            bot.telegram.sendMessage(id, `Успешное обновление`).then(r => {
+            })
+            bot.telegram.sendSticker(id, 'CAACAgIAAxkBAAEHK4pjuoKkGSffpgZH7FAMCxqOvdItxgACCh0AAsGoIEkIjTf-YvDReC0E').then(r => {
+            })
         } else {
-            bot.telegram.sendMessage(id, `Ошибка записи. Пожалуйста, повторите обновление данных`).then(r =>{})
+            bot.telegram.sendMessage(id, `Ошибка записи. Пожалуйста, повторите обновление данных`).then(r => {
+            })
         }
 
     })
@@ -75,7 +77,7 @@ async function checkUser(data) {
 }
 
 
-bot.start( async (ctx) => {
+bot.start(async (ctx) => {
     // console.log('start --' +  ctx.message.from)
     // console.log(ctx.message.from)
     checkUser(ctx.message.from).then(async (result) => {
@@ -90,9 +92,9 @@ bot.start( async (ctx) => {
 
             )
         }
-    }).catch ( e => {
+    }).catch(e => {
         console.log(e)
-        })
+    })
 
 })//ответ бота на команду /start
 
@@ -101,46 +103,46 @@ async function checkAndReply(ctx) {
     // console.log(ctx.message.from)
     checkUser(ctx.message.from)
         .then(async (result) => {
-          if (result) {
-            callDb.getOne(ctx.message.from).then(async (result) => {
-                // console.log('result -- ');
-                // console.log(result);
-                await ctx.replyWithHTML(
-                    `<b>${ctx.message.from.first_name ? ctx.message.from.first_name : 'незнакомец'}!`+
-                    `</b>\nВаши данные:\n`+
-                    `<b>Имя ребенка</b> - ${result.baby_name_telegram}\n`+
-                    `<b>Дата рождения ребенка</b> - ${result.birthday_telegram}\n`+
-                    `<b>Ваши Имя и Фамилия</b> - ${result.real_name_telegram}\n`+
-                    `<b>Ваш емейл</b> - ${result.email_telegram}`,
-                    Markup.inlineKeyboard([
-                        [Markup.button.callback("Верно", "right"), Markup.button.callback("Изменить", "update")]
-                    ])
-                )
+            if (result) {
+                callDb.getOne(ctx.message.from).then(async (result) => {
+                        // console.log('result -- ');
+                        // console.log(result);
+                        await ctx.replyWithHTML(
+                            `<b>${ctx.message.from.first_name ? ctx.message.from.first_name : 'незнакомец'}!` +
+                            `</b>\nВаши данные:\n` +
+                            `<b>Имя ребенка</b> - ${result.baby_name_telegram}\n` +
+                            `<b>Дата рождения ребенка</b> - ${result.birthday_telegram}\n` +
+                            `<b>Ваши Имя и Фамилия</b> - ${result.real_name_telegram}\n` +
+                            `<b>Ваш емейл</b> - ${result.email_telegram}`,
+                            Markup.inlineKeyboard([
+                                [Markup.button.callback("Верно", "right"), Markup.button.callback("Изменить", "update")]
+                            ])
+                        )
 //++++++++++++++++++++++++++++++++++++++
-                    bot.on('callback_query', async (callbackQuery) => {
-                        // console.log('callback_query event', callbackQuery);
-                        const action = callbackQuery.update.callback_query.data;
-                        // console.log('callback_query data ---- ', callbackQuery.update.callback_query.data);
-                        const ctx = callbackQuery ;
-                       if (action === 'right') {
-                            // console.log('right action -- ' + result.chatId);
-                            await ctx.answerCbQuery();
-                           await ctx.telegram.sendSticker(result.chatId, 'CAACAgIAAxkBAAEHK09julSXNlyU_2jfoNEsGktOpMn6rQACsAEAAhZCawpyXcYrBVvoaC0E')
-                        } else if (action === 'update') {
-                            // console.log('update action');
-                           await ctx.answerCbQuery();
-                           await ctx.telegram.sendMessage( result.chatId, `Пойдем обновлять данные`)
-                           await ctx.scene.enter('baby');
-                        }
-                    });
+                        bot.on('callback_query', async (callbackQuery) => {
+                            // console.log('callback_query event', callbackQuery);
+                            const action = callbackQuery.update.callback_query.data;
+                            // console.log('callback_query data ---- ', callbackQuery.update.callback_query.data);
+                            const ctx = callbackQuery;
+                            if (action === 'right') {
+                                // console.log('right action -- ' + result.chatId);
+                                await ctx.answerCbQuery();
+                                await ctx.telegram.sendSticker(result.chatId, 'CAACAgIAAxkBAAEHK09julSXNlyU_2jfoNEsGktOpMn6rQACsAEAAhZCawpyXcYrBVvoaC0E')
+                            } else if (action === 'update') {
+                                // console.log('update action');
+                                await ctx.answerCbQuery();
+                                await ctx.telegram.sendMessage(result.chatId, `Пойдем обновлять данные`)
+                                await ctx.scene.enter('baby');
+                            }
+                        });
 //=====================================
-                }
-            )
+                    }
+                )
 
-        } else {
-            await ctx.scene.enter('baby');
-        }
-    }).catch ( e => {
+            } else {
+                await ctx.scene.enter('baby');
+            }
+        }).catch(e => {
         console.log(e)
     })
 }
@@ -154,18 +156,22 @@ bot.command('check', async (ctx) => {
     await checkAndReply(ctx);
 });
 
-
+bot.help(async (ctx) => {
+    await ctx.replyWithHTML(help.help)
+    await ctx.telegram.sendSticker(ctx.message.from.id, 'CAACAgIAAxkBAAEHLnBju3AHWWk_-r_jjHgXlXAl16HJugACwxMAAm3oEEqGY8B94dy6NC0E').then(r => {
+    })
+});
 
 
 // parse requests of content-type - application/json
 app.use(express.json());
 
 // parse requests of content-type - application/x-www-form-urlencoded
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({extended: true}));
 
 // simple route
 app.get("/", (req, res) => {
-    res.json({ message: "Welcome! Alexey! nnnn Node" });
+    res.json({message: "Welcome! Alexey! nnnn Node"});
 });
 
 const db = require("./models");
@@ -185,7 +191,7 @@ process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
 
 // set port, listen for requests
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}.`);
 });
