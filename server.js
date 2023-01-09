@@ -2,9 +2,9 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const {Telegraf, Markup, Scenes, session} = require('telegraf');
-// const BOT_TOKEN = `5815175979:AAGXqlzqxeq9LCigysbmxrqmhVrsD76LGos` //helen
-const BOT_TOKEN = "5739415913:AAG0e8F6BtVEFHusoIRix8wvkKN23RZpcsc"
-const bot = new Telegraf(BOT_TOKEN);
+const environment = process.env.NODE_ENV || 'development';
+const config = require(`./token/config.${environment}.json`);
+const bot = new Telegraf(config.token);
 const {createStore} = require('redux');
 const SceneGenerator = require('./scenes/Scenes')
 const help = require("./common/help")
@@ -14,6 +14,8 @@ const nameScene = curScene.GenNameScene()
 const babyScene = curScene.GenBabyScene()
 const emailScene = curScene.GenEmailScene()
 const callDb = require("./controllers/tutorial.controller")
+
+
 
 
 // Редьюсер, который обновляет свойство 'data' состояния хранилища
@@ -122,16 +124,17 @@ async function checkAndReply(ctx) {
                         bot.on('callback_query', async (callbackQuery) => {
                             // console.log('callback_query event', callbackQuery);
                             const action = callbackQuery.update.callback_query.data;
-                            // console.log('callback_query data ---- ', callbackQuery.update.callback_query.data);
+                            // console.log('callback_query data ---- ', callbackQuery.from.id);
+                            const userId = callbackQuery.from.id;
                             const ctx = callbackQuery;
                             if (action === 'right') {
                                 // console.log('right action -- ' + result.chatId);
                                 await ctx.answerCbQuery();
-                                await ctx.telegram.sendSticker(result.chatId, 'CAACAgIAAxkBAAEHK09julSXNlyU_2jfoNEsGktOpMn6rQACsAEAAhZCawpyXcYrBVvoaC0E')
+                                await ctx.telegram.sendSticker(userId, 'CAACAgIAAxkBAAEHK09julSXNlyU_2jfoNEsGktOpMn6rQACsAEAAhZCawpyXcYrBVvoaC0E')
                             } else if (action === 'update') {
                                 // console.log('update action');
                                 await ctx.answerCbQuery();
-                                await ctx.telegram.sendMessage(result.chatId, `Пойдем обновлять данные`)
+                                await ctx.telegram.sendMessage(userId, `Пойдем обновлять данные`)
                                 await ctx.scene.enter('baby');
                             }
                         });

@@ -6,7 +6,7 @@ module.exports = {
     dialect: "mysql",
     charset: 'utf8mb4',
     pool: {
-        max: 5,
+        max: 19,
         min: 0,
         acquire: 30000,
         idle: 10000
