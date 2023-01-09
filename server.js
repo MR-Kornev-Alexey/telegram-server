@@ -14,14 +14,14 @@ const nameScene = curScene.GenNameScene()
 const babyScene = curScene.GenBabyScene()
 const emailScene = curScene.GenEmailScene()
 const callDb = require("./controllers/tutorial.controller")
+const diffTime = require("./common/differentMonths")
 
 
-
+// diffTime.calculating('11-10-2022');
 
 // Редьюсер, который обновляет свойство 'data' состояния хранилища
 function dataReducer(state = {data: []}, action) {
     switch (action.type) {
-
         case 'ADD_DATA':
             return {...state, data: [...state.data, action.payload]};
         default:
@@ -114,6 +114,7 @@ async function checkAndReply(ctx) {
                             `</b>\nВаши данные:\n` +
                             `<b>Имя ребенка</b> - ${result.baby_name_telegram}\n` +
                             `<b>Дата рождения ребенка</b> - ${result.birthday_telegram}\n` +
+                            `<b>Число полных месяцев</b> - ${diffTime.calculating(result.birthday_telegram)}\n`+
                             `<b>Ваши Имя и Фамилия</b> - ${result.real_name_telegram}\n` +
                             `<b>Ваш емейл</b> - ${result.email_telegram}`,
                             Markup.inlineKeyboard([
