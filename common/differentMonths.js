@@ -21,10 +21,10 @@ exports.calculating = (d1) =>{
 // Извлекаем день, месяц и год
     if(d1){
         const oldDay = Number(d1.substring(0, 2));
-        const oldMonth = Number(d1.substring(3, 5)) - 1;
+        const oldMonth = Number(d1.substring(3, 5));
         const oldYear = Number(d1.substring(6));
-//     const [oldDay, oldMonth, oldYear] = d1.match(/(\d{2})-(\d{2})-(\d{4})/).slice(1);
-//     console.log(oldYear,"  ",oldMonth,"   ", oldDay)
+//      const [oldDay, oldMonth, oldYear] = d1.match(/(\d{2})-(\d{2})-(\d{4})/).slice(1);
+//      console.log(oldYear,"  ",oldMonth,"   ", oldDay)
         const fromNew  = new Date(oldYear,oldMonth - 1, oldDay)
         // console.log(fromNew)
         const date = new Date();

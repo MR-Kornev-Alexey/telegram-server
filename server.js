@@ -1,10 +1,13 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const {Telegraf, Markup, Scenes, session} = require('telegraf');
-const environment = process.env.NODE_ENV || 'development';
-const config = require(`./token/config.${environment}.json`);
-const bot = new Telegraf(config.token);
+const {Telegraf, Markup, Scenes, session} = require('telegraf')
+// const environment = process.env.NODE_ENV || 'development';
+// const config = require(`./token/config.${environment}.json`);
+// const bot = new Telegraf(config.token);
+// const token = "5739415913:AAG0e8F6BtVEFHusoIRix8wvkKN23RZpcsc"
+const token = "5815175979:AAGXqlzqxeq9LCigysbmxrqmhVrsD76LGos" //helen_bot
+const bot = new Telegraf(token);
 const {createStore} = require('redux');
 const SceneGenerator = require('./scenes/Scenes')
 const help = require("./common/help")
@@ -15,11 +18,19 @@ const babyScene = curScene.GenBabyScene()
 const emailScene = curScene.GenEmailScene()
 const callDb = require("./controllers/tutorial.controller")
 const diffTime = require("./common/differentMonths")
+const {sendHelp} = require("./lib/help")
+const {
+    startHomeworkMenu,
+    actionHomeworkMenuMove,
+    actionHomeworkMenuEmo,
+    actionHomeworkMenuSpeak,
+    returnHomeworkMenu,
+    homeworksList
+} = require('./homeworks');
 
 
 // diffTime.calculating('11-10-2022');
 
-// Редьюсер, который обновляет свойство 'data' состояния хранилища
 function dataReducer(state = {data: []}, action) {
     switch (action.type) {
         case 'ADD_DATA':
@@ -30,8 +41,9 @@ function dataReducer(state = {data: []}, action) {
 }
 
 const app = express();
-
 const store = createStore(dataReducer);
+
+
 const checkScene = curScene.GenCheckScene(store, function (id) {
     callDb.updateUser(id, store.getState().data).then(result => {
         if (result === 123) {
@@ -110,11 +122,11 @@ async function checkAndReply(ctx) {
                         // console.log('result -- ');
                         // console.log(result);
                         await ctx.replyWithHTML(
-                            `<b>${ctx.message.from.first_name ? ctx.message.from.first_name : 'незнакомец'}!` +
-                            `</b>\nВаши данные:\n` +
+                            `<b>${ctx.message.from.first_name ? ctx.message.from.first_name : 'незнакомец'}!</b>\n` +
+                            `<b>Ваши данные:</b>\n` +
                             `<b>Имя ребенка</b> - ${result.baby_name_telegram}\n` +
                             `<b>Дата рождения ребенка</b> - ${result.birthday_telegram}\n` +
-                            `<b>Число полных месяцев</b> - ${diffTime.calculating(result.birthday_telegram)}\n`+
+                            `<b>Число полных месяцев</b> - ${diffTime.calculating(result.birthday_telegram)}\n` +
                             `<b>Ваши Имя и Фамилия</b> - ${result.real_name_telegram}\n` +
                             `<b>Ваш емейл</b> - ${result.email_telegram}`,
                             Markup.inlineKeyboard([
@@ -151,6 +163,7 @@ async function checkAndReply(ctx) {
     })
 }
 
+bot.help(sendHelp);
 
 bot.command('registration', async (ctx) => {
     await checkAndReply(ctx);
@@ -159,12 +172,73 @@ bot.command('registration', async (ctx) => {
 bot.command('check', async (ctx) => {
     await checkAndReply(ctx);
 });
-
-bot.help(async (ctx) => {
-    await ctx.replyWithHTML(help.help)
-    await ctx.telegram.sendSticker(ctx.message.from.id, 'CAACAgIAAxkBAAEHLnBju3AHWWk_-r_jjHgXlXAl16HJugACwxMAAm3oEEqGY8B94dy6NC0E').then(r => {
-    })
+bot.command('homeworks', ctx => {
+    startHomeworkMenu(ctx).then(r => {
+    });
 });
+
+// bot.use((ctx, next) => {
+//     //Extract action_id
+//     const id = ctx.update.callback_query.data
+//     const message = ctx.update.callback_query
+//     console.log("The action id is:", id , "ID user ", message.from.id);
+//     return next();
+// });
+
+
+
+
+bot.action('start', ctx => {
+    returnHomeworkMenu(ctx).then(r => {
+    });
+});
+
+// bot.action('mov_0_2', ctx => {
+//     homeworksList(ctx, 'mov_0_2').then(r => {
+//     });
+// });
+// bot.action('spk_0_2', ctx => {
+//     homeworksList(ctx, 'spk_0_2').then(r => {
+//     });
+// });
+// bot.action('emo_0_2', ctx => {
+//     homeworksList(ctx, 'emo_0_2').then(r => {
+//     });
+// });
+bot.action(/(\d+)/, ctx => {
+    // Extract the dynamic part of the action id
+    const id = ctx.update.callback_query.data
+    console.log("The action id is:", id);
+    const action= id.substring(0,4)
+    console.log("The action id is:", action);
+    ctx.answerCbQuery()
+    if(action === 'link'){
+       const userId = ctx.update.callback_query.from.id
+        console.log("The action id is next ", userId);
+        ctx.telegram.sendMessage(userId, `https://youtu.be/YmNsX4ArqpQ`).then(r => {})
+
+    }else {
+          homeworksList(ctx, id).then(r => {
+        });
+    }
+
+});
+
+bot.action('mov_menu', ctx => {
+    actionHomeworkMenuMove(ctx).then(r => {
+    });
+});
+
+bot.action('emo_menu', ctx => {
+    actionHomeworkMenuEmo(ctx).then(r => {
+    });
+});
+
+bot.action('spk_menu', ctx => {
+    actionHomeworkMenuSpeak(ctx).then(r => {
+    });
+});
+
 
 
 // parse requests of content-type - application/json
