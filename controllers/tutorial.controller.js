@@ -1,4 +1,5 @@
 const db = require("../models");
+const {link} = require("telegraf/format");
 const dataBot = db.tutorials;
 const Op = db.Sequelize.Op;
 
@@ -14,7 +15,7 @@ exports.create = (data) => {
     };
     // console.log('newUser = ')
     // console.log(newUser)
-    dataBot.create(newUser)
+    dataBot.Tutorial.create(newUser)
         .catch(err => {
         console.log(err)
         })
@@ -25,11 +26,64 @@ exports.findAll = (req, res) => {
 
 };
 
+exports.searchWatch = async (req, res) =>{
+    return await dataBot.HomeworksMark.findAll({ where: { userId: req.userId , content: req.urlLink} })
+        .then(data => {
+            console.log(data)
+            return !(!data || Object.keys(data).length === 0);
+        })
+        .catch(err => {
+            console.log(err)
+            return err;
+        });
+};
+
 // Find a single Tutorial with an id
 async function findAndLogUser(data) {
     // console.log('findAndLogUser(data)  - ' + data)
     // console.log(data)
-    const user = await dataBot.findByPk(data);
+    const user = await dataBot.Tutorial.findByPk(data);
+    if (user) {
+        // console.log(`Пользователь с id = ${data}`);
+        // console.log(user.dataValues);
+        return user.dataValues;
+    } else {
+        // console.log(`Пользователь не найден`);
+        return null;
+    }
+}
+exports.recordLink = async (chatId, videoId , linkID) => {
+
+    const user = await dataBot.HomeworksMark.findByPk(chatId)
+    if (user) {
+        const newUserWatch = {
+            userId: chatId,
+            idHomework: videoId,
+            content: linkID,
+        };
+        console.log(`Пользователь с id = ${chatId}`);
+        console.log(user.dataValues);
+         return dataBot.HomeworksMark.update(newUserWatch)
+        // return user.dataValues;
+    } else {
+        const newUserWatch = {
+            userId: chatId,
+            idHomework: videoId,
+            content: linkID,
+        };
+        console.log(`Пользователь не найден`);
+        console.log('newUserWatch = ')
+        console.log(newUserWatch)
+        await dataBot.HomeworksMark.create(newUserWatch)
+            .catch(err => {
+                console.log(err)
+            })
+    }
+}
+exports.getOneUser = async (data) => {
+    // console.log('findAndLogUser(data)  - ' + data)
+    // console.log(data)
+    const user = await dataBot.Tutorial.findByPk(data);
     if (user) {
         // console.log(`Пользователь с id = ${data}`);
         // console.log(user.dataValues);
@@ -63,7 +117,7 @@ exports.updateUser = (id,data) => {
     // console.log("targetItem  -- ")
     // console.log(targetItem)
 
-    return dataBot.update(targetItem, {
+    return dataBot.Tutorial.update(targetItem, {
         where: { chatId: id }
     })
         .then(result => {

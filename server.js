@@ -10,8 +10,10 @@ const token = "5815175979:AAGXqlzqxeq9LCigysbmxrqmhVrsD76LGos" //helen_bot
 const bot = new Telegraf(token);
 const {createStore} = require('redux');
 const SceneGenerator = require('./scenes/Scenes')
-const help = require("./common/help")
+const HomeworksGenerator = require('./scenes/Homeworks')
 const curScene = new SceneGenerator()
+const homeScene = new HomeworksGenerator()
+const startScene = homeScene.GenStartScene()
 const ageScene = curScene.GenAgeScene()
 const nameScene = curScene.GenNameScene()
 const babyScene = curScene.GenBabyScene()
@@ -19,13 +21,15 @@ const emailScene = curScene.GenEmailScene()
 const callDb = require("./controllers/tutorial.controller")
 const diffTime = require("./common/differentMonths")
 const {sendHelp} = require("./lib/help")
+const { getClose } = require('./lib/keyboards')
 const {
     startHomeworkMenu,
     actionHomeworkMenuMove,
     actionHomeworkMenuEmo,
     actionHomeworkMenuSpeak,
     returnHomeworkMenu,
-    homeworksList
+    homeworksList,
+    actionGetOneHomework
 } = require('./homeworks');
 
 
@@ -60,7 +64,7 @@ const checkScene = curScene.GenCheckScene(store, function (id) {
 });
 
 
-const stage = new Scenes.Stage([ageScene, nameScene, babyScene, checkScene, emailScene])
+const stage = new Scenes.Stage([ageScene, nameScene, babyScene, checkScene, emailScene, startScene])
 bot.use(session())
 bot.use(stage.middleware())
 
@@ -92,8 +96,6 @@ async function checkUser(data) {
 
 
 bot.start(async (ctx) => {
-    // console.log('start --' +  ctx.message.from)
-    // console.log(ctx.message.from)
     checkUser(ctx.message.from).then(async (result) => {
         if (result) {
             await ctx.replyWithHTML(
@@ -102,8 +104,6 @@ bot.start(async (ctx) => {
         } else {
             await ctx.replyWithHTML(
                 `<b>Добрый день ${ctx.message.from.first_name ? ctx.message.from.first_name : 'незнакомец'}!</b>\nПройдите,пожалуйста процедуру регистрации, нажав "Регистрация ребенка" в меню`,
-                // getMainMenu()
-
             )
         }
     }).catch(e => {
@@ -111,6 +111,10 @@ bot.start(async (ctx) => {
     })
 
 })//ответ бота на команду /start
+
+bot.command('support', async (ctx) => ctx.replyWithHTML(`Вы можете написать в Службу поддержки Бота\n https://t.me/mrk_service`,
+     await getClose()
+))
 
 async function checkAndReply(ctx) {
     // console.log('checkAndReply(ctx) --')
@@ -172,73 +176,9 @@ bot.command('registration', async (ctx) => {
 bot.command('check', async (ctx) => {
     await checkAndReply(ctx);
 });
-bot.command('homeworks', ctx => {
-    startHomeworkMenu(ctx).then(r => {
-    });
+bot.command('homeworks', async ctx => {
+    await ctx.scene.enter('start');
 });
-
-// bot.use((ctx, next) => {
-//     //Extract action_id
-//     const id = ctx.update.callback_query.data
-//     const message = ctx.update.callback_query
-//     console.log("The action id is:", id , "ID user ", message.from.id);
-//     return next();
-// });
-
-
-
-
-bot.action('start', ctx => {
-    returnHomeworkMenu(ctx).then(r => {
-    });
-});
-
-// bot.action('mov_0_2', ctx => {
-//     homeworksList(ctx, 'mov_0_2').then(r => {
-//     });
-// });
-// bot.action('spk_0_2', ctx => {
-//     homeworksList(ctx, 'spk_0_2').then(r => {
-//     });
-// });
-// bot.action('emo_0_2', ctx => {
-//     homeworksList(ctx, 'emo_0_2').then(r => {
-//     });
-// });
-bot.action(/(\d+)/, ctx => {
-    // Extract the dynamic part of the action id
-    const id = ctx.update.callback_query.data
-    console.log("The action id is:", id);
-    const action= id.substring(0,4)
-    console.log("The action id is:", action);
-    ctx.answerCbQuery()
-    if(action === 'link'){
-       const userId = ctx.update.callback_query.from.id
-        console.log("The action id is next ", userId);
-        ctx.telegram.sendMessage(userId, `https://youtu.be/YmNsX4ArqpQ`).then(r => {})
-
-    }else {
-          homeworksList(ctx, id).then(r => {
-        });
-    }
-
-});
-
-bot.action('mov_menu', ctx => {
-    actionHomeworkMenuMove(ctx).then(r => {
-    });
-});
-
-bot.action('emo_menu', ctx => {
-    actionHomeworkMenuEmo(ctx).then(r => {
-    });
-});
-
-bot.action('spk_menu', ctx => {
-    actionHomeworkMenuSpeak(ctx).then(r => {
-    });
-});
-
 
 
 // parse requests of content-type - application/json
@@ -249,7 +189,7 @@ app.use(express.urlencoded({extended: true}));
 
 // simple route
 app.get("/", (req, res) => {
-    res.json({message: "Welcome! Alexey! nnnn Node"});
+    res.json({message: "Welcome! Alexey! Node"});
 });
 
 const db = require("./models");

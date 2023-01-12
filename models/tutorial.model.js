@@ -63,6 +63,35 @@ module.exports = (sequelize, Sequelize) => {
             defaultValue: false
         }
     });
+    const HomeworksWatch = sequelize.define('homeworksWatch', {
+        userId: {
+            type: Sequelize.BIGINT,
+            primaryKey: true,
+            autoIncrement: true,
+        },
+        idHomework: {
+            type: Sequelize.STRING,
+        },
+        content: {
+            type: Sequelize.STRING,
+        },
+    });
+    const HomeworksMark = sequelize.define('homeworksMark', {
+        id: {
+            type: Sequelize.BIGINT,
+            primaryKey: true,
+            autoIncrement: true,
+        },
+        userId: {
+            type: Sequelize.BIGINT,
+        },
+        idHomework: {
+            type: Sequelize.STRING,
+        },
+        content: {
+            type: Sequelize.STRING,
+        },
+    });
 
-    return Tutorial;
+    return { Tutorial, HomeworksWatch, HomeworksMark };
 };
