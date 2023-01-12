@@ -22,18 +22,6 @@ const callDb = require("./controllers/tutorial.controller")
 const diffTime = require("./common/differentMonths")
 const {sendHelp} = require("./lib/help")
 const { getClose } = require('./lib/keyboards')
-const {
-    startHomeworkMenu,
-    actionHomeworkMenuMove,
-    actionHomeworkMenuEmo,
-    actionHomeworkMenuSpeak,
-    returnHomeworkMenu,
-    homeworksList,
-    actionGetOneHomework
-} = require('./homeworks');
-
-
-// diffTime.calculating('11-10-2022');
 
 function dataReducer(state = {data: []}, action) {
     switch (action.type) {
@@ -117,8 +105,6 @@ bot.command('support', async (ctx) => ctx.replyWithHTML(`Вы можете на�
 ))
 
 async function checkAndReply(ctx) {
-    // console.log('checkAndReply(ctx) --')
-    // console.log(ctx.message.from)
     checkUser(ctx.message.from)
         .then(async (result) => {
             if (result) {
