@@ -57,7 +57,7 @@ class HomeworksGenerator {
             const messageId = ctx.update.callback_query.message.message_id
             ctx.answerCbQuery()
             await ctx.telegram.deleteMessage(chatId, messageId)
-            await ctx.scene.leave()
+            // await ctx.scene.leave()
         });
 
         start.action('close_video', async ctx => {
