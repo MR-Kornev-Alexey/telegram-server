@@ -1,5 +1,4 @@
 const db = require("../models");
-const {link} = require("telegraf/format");
 const dataBot = db.tutorials;
 const Op = db.Sequelize.Op;
 
@@ -37,7 +36,16 @@ exports.searchWatch = async (req, res) =>{
             return err;
         });
 };
-
+exports.searchSend = async (req, res) =>{
+    return await dataBot.Tutorial.findAll({ where: { access_dev_0_12: true }} )
+        .then(data => {
+               return data
+        })
+        .catch(err => {
+            console.log(err)
+            return err;
+        });
+};
 // Find a single Tutorial with an id
 async function findAndLogUser(data) {
     // console.log('findAndLogUser(data)  - ' + data)

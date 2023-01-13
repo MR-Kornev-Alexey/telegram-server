@@ -217,10 +217,7 @@ async function finishSent (data,link){
     if (!data){
        return link
     } else {
-        return '+++++++++++++++++++++++++++\n' +
-               '❗ Вы это видео уже смотрели ❗\n' +
-               '+++++++++++++++++++++++++++\n' +
-               link
+        return '❤️Вы это видео уже смотрели❤️\n' + link
     }
 }
 module.exports = {

@@ -5,14 +5,17 @@ const {Telegraf, Markup, Scenes, session} = require('telegraf')
 // const environment = process.env.NODE_ENV || 'development';
 // const config = require(`./token/config.${environment}.json`);
 // const bot = new Telegraf(config.token);
-const token = "5739415913:AAG0e8F6BtVEFHusoIRix8wvkKN23RZpcsc" // main bot
-// const token = "5815175979:AAGXqlzqxeq9LCigysbmxrqmhVrsD76LGos" //helen_bot
+// const token = "5739415913:AAG0e8F6BtVEFHusoIRix8wvkKN23RZpcsc" // main bot
+const token = "5815175979:AAGXqlzqxeq9LCigysbmxrqmhVrsD76LGos" //helen_bot
 const bot = new Telegraf(token);
 const {createStore} = require('redux');
 const SceneGenerator = require('./scenes/Scenes')
 const HomeworksGenerator = require('./scenes/Homeworks')
+const HomeSendGenerator = require('./scenes/Send')
 const curScene = new SceneGenerator()
 const homeScene = new HomeworksGenerator()
+const sendScene = new HomeSendGenerator()
+const sendingHome = sendScene.GenHomeScene()
 const startScene = homeScene.GenStartScene()
 const ageScene = curScene.GenAgeScene()
 const nameScene = curScene.GenNameScene()
@@ -52,7 +55,7 @@ const checkScene = curScene.GenCheckScene(store, function (id) {
 });
 
 
-const stage = new Scenes.Stage([ageScene, nameScene, babyScene, checkScene, emailScene, startScene])
+const stage = new Scenes.Stage([ageScene, nameScene, babyScene, checkScene, emailScene, startScene, sendingHome])
 bot.use(session())
 bot.use(stage.middleware())
 
@@ -100,9 +103,7 @@ bot.start(async (ctx) => {
 
 })//ответ бота на команду /start
 
-bot.command('support', async (ctx) => ctx.replyWithHTML(`Вы можете написать в Службу поддержки Бота\n https://t.me/mrk_service`,
-     await getClose()
-))
+
 
 async function checkAndReply(ctx) {
     checkUser(ctx.message.from)
@@ -165,7 +166,13 @@ bot.command('check', async (ctx) => {
 bot.command('homeworks', async ctx => {
     await ctx.scene.enter('start');
 });
+bot.command('new', async ctx => {
+    await ctx.scene.enter('home');
+});
 
+bot.command('support', async (ctx) => ctx.replyWithHTML(`Вы можете написать в Службу поддержки Бота\n https://t.me/mrk_service`,
+    await getClose()
+))
 
 // parse requests of content-type - application/json
 app.use(express.json());
@@ -195,7 +202,7 @@ process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
 
 // set port, listen for requests
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}.`);
 });
