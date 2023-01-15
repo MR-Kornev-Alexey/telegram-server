@@ -92,6 +92,86 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.STRING,
         },
     });
+    const SendBlocked = sequelize.define('blocked', {
+        message: {
+            type: Sequelize.STRING,
+        },
+        chatIdGroup: {
+            type: Sequelize.STRING,
+        },
+        titleGroup: {
+            type: Sequelize.STRING,
+        },
+        chatIdUser: {
+            type: Sequelize.STRING,
+        },
+        nicknameUser: {
+            type: Sequelize.STRING,
+        },
+        realNameUser: {
+            type: Sequelize.STRING,
+        }
+    });
+    const Intensive = sequelize.define("intensive", {
+        chatId: {
+            type: Sequelize.BIGINT,
+            primaryKey: true,
+            autoIncrement: true
+        },
+        name_telegram: {
+            type: Sequelize.STRING
+        },
+        first_name_telegram: {
+            type: Sequelize.STRING
+        },
+        last_name_telegram: {
+            type: Sequelize.STRING
+        },
+        baby_name_telegram: {
+            type: Sequelize.STRING,
+            defaultValue: 'not-data'
+        },
+        birthday_telegram: {
+            type: Sequelize.STRING,
+            defaultValue: 'not-data'
+        },
+        pay_telegram:
+            {type: Sequelize.INTEGER,
+                defaultValue: 0
+            },
+        real_name_telegram: {
+            type: Sequelize.STRING,
+            defaultValue: 'not-data'
+        },
+        email_telegram: {
+            type: Sequelize.STRING,
+            defaultValue: 'not-data'
+        },
+        status: {
+            type: Sequelize.STRING,
+            defaultValue: 'member'
+        },
+        note: {
+             type: Sequelize.STRING,
+            defaultValue: 'note'
+        },
+        news:{
+            type: Sequelize.BOOLEAN,
+            defaultValue: true
+        },
+        number: {
+            type: Sequelize.STRING,
+            defaultValue: 'number-1'
+        },
+        add1: {
+            type: Sequelize.STRING,
+            defaultValue: 'add1'
+        },
+        add2: {
+            type: Sequelize.STRING,
+            defaultValue: 'add2'
+        }
+    });
 
-    return { Tutorial, HomeworksWatch, HomeworksMark };
+    return { Tutorial, HomeworksMark, Intensive, SendBlocked};
 };

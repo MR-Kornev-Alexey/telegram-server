@@ -101,7 +101,35 @@ exports.getOneUser = async (data) => {
         return null;
     }
 }
+exports.findUserByPk = async (data) => {
+    try {
+        // console.log(user)
+        return await dataBot.Tutorial.findByPk(data);
+    } catch (err) {
+        console.log(err);
+        throw err;
+    }
+};
 
+// exports.findOneAdmin = (data) => {
+//     return new Promise(async (resolve, reject) => {
+//         await dataBot.Tutorial.findByPk(data).then((user) => {
+//             console.log(user)
+//                 if (user) {
+//                     if(user.role_telegram === "admin"){
+//                         resolve(true);
+//                     }
+//                     resolve(false);
+//                 } else {
+//                     resolve(false);
+//                 }
+//             })
+//             .catch((err) => {
+//                 console.log(err);
+//                 reject(err);
+//             });
+//     });
+// };
 exports.findOne = (data) => {
     return new Promise((resolve, reject) => {
         findAndLogUser(data)

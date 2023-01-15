@@ -5,9 +5,15 @@ const {Telegraf, Markup, Scenes, session} = require('telegraf')
 // const environment = process.env.NODE_ENV || 'development';
 // const config = require(`./token/config.${environment}.json`);
 // const bot = new Telegraf(config.token);
-// const token = "5739415913:AAG0e8F6BtVEFHusoIRix8wvkKN23RZpcsc" // main bot
-const token = "5815175979:AAGXqlzqxeq9LCigysbmxrqmhVrsD76LGos" //helen_bot
-const bot = new Telegraf(token);
+"5858592661:AAGdzbUERIMeXsAANjKkONyCZDk56TDnON0"
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+const token_dev = "5858592661:AAGdzbUERIMeXsAANjKkONyCZDk56TDnON0"// test bot
+// const token_dev = "5739415913:AAG0e8F6BtVEFHusoIRix8wvkKN23RZpcsc" // main bot
+const bot = new Telegraf(token_dev);
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+const token_helen = "5815175979:AAGXqlzqxeq9LCigysbmxrqmhVrsD76LGos" //helen_bot
+const helen = new Telegraf(token_helen);
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 const {createStore} = require('redux');
 const SceneGenerator = require('./scenes/Scenes')
 const HomeworksGenerator = require('./scenes/Homeworks')
@@ -23,8 +29,9 @@ const babyScene = curScene.GenBabyScene()
 const emailScene = curScene.GenEmailScene()
 const callDb = require("./controllers/tutorial.controller")
 const diffTime = require("./common/differentMonths")
-const {sendHelp} = require("./lib/help")
-const { getClose } = require('./lib/keyboards')
+const {sendHelp, sendHelpHelen} = require("./lib/help")
+const {getClose} = require('./lib/keyboards')
+const HelenFunction = require('./helenFunction/function')
 
 function dataReducer(state = {data: []}, action) {
     switch (action.type) {
@@ -85,8 +92,46 @@ async function checkUser(data) {
     });
 }
 
-
 bot.start(async (ctx) => {
+    await checkUser(ctx.message.from).then(async (result) => {
+        if (result) {
+            await ctx.replyWithHTML(
+                `<b>Добрый день ${ctx.message.from.first_name ? ctx.message.from.first_name : 'незнакомец'}!</b>\nВы можете проверить свои данные, нажав на "Проверить данные" в меню`,
+            )
+        } else {
+            await ctx.replyWithHTML(
+                `<b>Добрый день ${ctx.message.from.first_name ? ctx.message.from.first_name : 'незнакомец'}!</b>\nПройдите,пожалуйста процедуру регистрации, нажав "Регистрация ребенка" в меню`,
+            )
+        }
+    }).catch(e => {
+        console.log(e)
+    })
+
+})
+
+
+helen.start(async (ctx) => {
+    await ctx.replyWithHTML(
+        `<b>Добрый день ${ctx.message.from.first_name ? ctx.message.from.first_name : 'незнакомец'}!</b>\nЭто бот рассылки Домашних заданий от  Елены Корневой\nПерейти на сайт http://elenakorneva.ru/`,
+    )
+})
+
+helen.on('message', async (ctx) => {
+    // console.log(ctx.message)
+    switch (ctx.message.text) {
+        case '/support':
+            ctx.replyWithHTML(`Вы можете написать в Службу поддержки Бота\nhttps://t.me/mrk_service`)
+            break
+        case '/help':
+            await ctx.replyWithHTML(helpHelen.help)
+            await ctx.telegram.sendSticker(ctx.message.from.id, 'CAACAgIAAxkBAAEHLnBju3AHWWk_-r_jjHgXlXAl16HJugACwxMAAm3oEEqGY8B94dy6NC0E')
+            break
+        default :
+            await HelenFunction.mainCheckAdmin(ctx)
+    }
+})
+
+helen.start(async (ctx) => {
     checkUser(ctx.message.from).then(async (result) => {
         if (result) {
             await ctx.replyWithHTML(
@@ -101,8 +146,7 @@ bot.start(async (ctx) => {
         console.log(e)
     })
 
-})//ответ бота на команду /start
-
+})
 
 
 async function checkAndReply(ctx) {
@@ -154,8 +198,9 @@ async function checkAndReply(ctx) {
     })
 }
 
-bot.help(sendHelp);
 
+bot.command('support', async (ctx) => ctx.replyWithHTML(`Вы можете написать в Службу поддержки Бота\n https://t.me/mrk_service`
+))
 bot.command('registration', async (ctx) => {
     await checkAndReply(ctx);
 });
@@ -186,6 +231,7 @@ app.get("/", (req, res) => {
 });
 
 const db = require("./models");
+const helpHelen = require("./common/helpHelen");
 
 db.sequelize.sync()
     .then(() => {
@@ -196,10 +242,15 @@ db.sequelize.sync()
     });
 
 
-// Enable graceful stop
+//++++++++++++++++++++++Enable graceful stop+++++++++++++++++++++++++++++++++++
+bot.help(sendHelp);
 bot.launch();
+helen.launch();
 process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
+process.once('SIGINT', () => helen.stop('SIGINT'));
+process.once('SIGTERM', () => helen.stop('SIGTERM'));
+//============================================================================
 
 // set port, listen for requests
 const PORT = process.env.PORT || 8000;
