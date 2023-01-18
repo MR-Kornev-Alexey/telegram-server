@@ -3,6 +3,22 @@ const dataBot = db.tutorials;
 const Op = db.Sequelize.Op;
 
 // Create and Save a new Tutorial
+exports.createHelen = (data) => {
+    // console.log('data_in_create =  ' +  data)
+    // console.log(data)
+    const newUser = {
+        name_telegram: data.username,
+        first_name_telegram: data.first_name,
+        last_name_telegram: data.last_name,
+        chatId: data.id
+    };
+    // console.log('newUser = ')
+    // console.log(newUser)
+    dataBot.Helen.create(newUser)
+        .catch(err => {
+            console.log(err)
+        })
+};
 exports.create = (data) => {
     // console.log('data_in_create =  ' +  data)
     // console.log(data)
@@ -19,22 +35,65 @@ exports.create = (data) => {
         console.log(err)
         })
 };
+exports.checkUserForIntensive= async (id) => {
+    const user = await dataBot.Intensive.findByPk(id);
+    return !!user;
+}
 
-// Retrieve all Tutorials from the database.
-exports.findAll = (req, res) => {
+exports.createUserForIntensive = async (data) => {
+    const newUser = {
+        email_telegram: data.email,
+        real_name_telegram: data.name,
+        baby_name_telegram: data.babyName,
+        birthday_telegram: data.birthdayBaby,
+        chatId: data.chatId,
+        first_name_telegram: data.first_name_telegram,
+    };
+    await dataBot.Intensive.create(newUser)
+        .catch(err => {
+            console.log(err)
+        })
+}
 
-};
-
-exports.searchWatch = async (req, res) =>{
-    return await dataBot.HomeworksMark.findAll({ where: { userId: req.userId , content: req.urlLink} })
-        .then(data => {
-            console.log(data)
-            return !(!data || Object.keys(data).length === 0);
+exports.findAllIntensive = async (req, res) => {
+    return await dataBot.Intensive.findAll({ where: { send: true }})
+        .then(user => {
+            // console.log(user)
+            return user;
         })
         .catch(err => {
             console.log(err)
             return err;
         });
+};
+exports.findAllIntensiveAll = async (req, res) => {
+    return await dataBot.Intensive.findAll()
+        .then(user => {
+            // console.log(user)
+            return user;
+        })
+        .catch(err => {
+            console.log(err)
+            return err;
+        });
+};
+
+
+// Retrieve all Tutorials from the database.
+exports.findAll = async (req, res) => {
+    return await dataBot.Tutorial.findAll()
+        .then(user => {
+            // console.log(data)
+            return user;
+        })
+        .catch(err => {
+            console.log(err)
+            return err;
+        });
+};
+
+exports.searchWatch = async (req, res) =>{
+
 };
 exports.searchSend = async (req, res) =>{
     return await dataBot.Tutorial.findAll({ where: { access_dev_0_12: true }} )
@@ -46,6 +105,20 @@ exports.searchSend = async (req, res) =>{
             return err;
         });
 };
+async function findAndLogUserHelen(data) {
+    // console.log('findAndLogUser(data)  - ' + data)
+    // console.log(data)
+
+    const user = await dataBot.Helen.findByPk(data);
+    if (user) {
+        console.log(`Пользователь с id = ${data}`);
+        console.log(user.dataValues);
+        return user.dataValues;
+    } else {
+        // console.log(`Пользователь не найден`);
+        return null;
+    }
+}
 // Find a single Tutorial with an id
 async function findAndLogUser(data) {
     // console.log('findAndLogUser(data)  - ' + data)
@@ -110,26 +183,22 @@ exports.findUserByPk = async (data) => {
         throw err;
     }
 };
-
-// exports.findOneAdmin = (data) => {
-//     return new Promise(async (resolve, reject) => {
-//         await dataBot.Tutorial.findByPk(data).then((user) => {
-//             console.log(user)
-//                 if (user) {
-//                     if(user.role_telegram === "admin"){
-//                         resolve(true);
-//                     }
-//                     resolve(false);
-//                 } else {
-//                     resolve(false);
-//                 }
-//             })
-//             .catch((err) => {
-//                 console.log(err);
-//                 reject(err);
-//             });
-//     });
-// };
+exports.findOneHelen = (data) => {
+    return new Promise((resolve, reject) => {
+        findAndLogUserHelen(data)
+            .then((user) => {
+                if (user) {
+                    resolve(true);
+                } else {
+                    resolve(false);
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+                reject(err);
+            });
+    });
+};
 exports.findOne = (data) => {
     return new Promise((resolve, reject) => {
         findAndLogUser(data)

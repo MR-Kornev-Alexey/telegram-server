@@ -155,9 +155,13 @@ module.exports = (sequelize, Sequelize) => {
              type: Sequelize.STRING,
             defaultValue: 'note'
         },
-        news:{
+        send:{
             type: Sequelize.BOOLEAN,
             defaultValue: true
+        },
+        news:{
+            type: Sequelize.BOOLEAN,
+            defaultValue: false
         },
         number: {
             type: Sequelize.STRING,
@@ -172,6 +176,22 @@ module.exports = (sequelize, Sequelize) => {
             defaultValue: 'add2'
         }
     });
+    const Helen = sequelize.define("helen", {
+        chatId: {
+            type: Sequelize.BIGINT,
+            primaryKey: true,
+            autoIncrement: true
+        },
+        name_telegram: {
+            type: Sequelize.STRING
+        },
+        first_name_telegram: {
+            type: Sequelize.STRING
+        },
+        last_name_telegram: {
+            type: Sequelize.STRING
+        }
+    });
 
-    return { Tutorial, HomeworksMark, Intensive, SendBlocked};
+    return { Tutorial, HomeworksMark, Intensive, SendBlocked, Helen};
 };

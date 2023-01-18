@@ -5,13 +5,14 @@ const {Telegraf, Markup, Scenes, session} = require('telegraf')
 // const environment = process.env.NODE_ENV || 'development';
 // const config = require(`./token/config.${environment}.json`);
 // const bot = new Telegraf(config.token);
-"5858592661:AAGdzbUERIMeXsAANjKkONyCZDk56TDnON0"
+// "5858592661:AAGdzbUERIMeXsAANjKkONyCZDk56TDnON0"
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 const token_dev = "5858592661:AAGdzbUERIMeXsAANjKkONyCZDk56TDnON0"// test bot
 // const token_dev = "5739415913:AAG0e8F6BtVEFHusoIRix8wvkKN23RZpcsc" // main bot
 const bot = new Telegraf(token_dev);
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 const token_helen = "5815175979:AAGXqlzqxeq9LCigysbmxrqmhVrsD76LGos" //helen_bot
+// const token_helen = "5739415913:AAG0e8F6BtVEFHusoIRix8wvkKN23RZpcsc" //main_bot
 const helen = new Telegraf(token_helen);
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 const {createStore} = require('redux');
@@ -111,9 +112,19 @@ bot.start(async (ctx) => {
 
 
 helen.start(async (ctx) => {
-    await ctx.replyWithHTML(
-        `<b>Добрый день ${ctx.message.from.first_name ? ctx.message.from.first_name : 'незнакомец'}!</b>\nЭто бот рассылки Домашних заданий от  Елены Корневой\nПерейти на сайт http://elenakorneva.ru/`,
-    )
+    await HelenFunction.checkUserHelen(ctx.message.from).then(async (result) => {
+        if (result) {
+            await ctx.replyWithHTML(
+                `<b>Добрый день ${ctx.message.from.first_name ? ctx.message.from.first_name : 'незнакомец'}!</b>\nВы уже подружились со мной.\nЖдите ДЗ согласно графику.`,
+            )
+        } else {
+            await ctx.replyWithHTML(
+                `<b>Добрый день ${ctx.message.from.first_name ? ctx.message.from.first_name : 'незнакомец'}!</b>\nПодружитесь, пожалуйста со мной, отправив мне слово дружба`,
+            )
+        }
+    }).catch(e => {
+        console.log(e)
+    })
 })
 
 helen.on('message', async (ctx) => {
@@ -253,7 +264,7 @@ process.once('SIGTERM', () => helen.stop('SIGTERM'));
 //============================================================================
 
 // set port, listen for requests
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}.`);
 });

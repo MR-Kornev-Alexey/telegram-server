@@ -34,33 +34,7 @@ class HomeSendGenerator {
         }
         const kind = ['mov', 'spk', 'emo']
 
-        async function diffInMonths(from, to) {
-            let months = to.getMonth() - from.getMonth() + (12 * (to.getFullYear() - from.getFullYear()))
-            if (to.getDate() < from.getDate()) {
-                const newFrom = new Date(to.getFullYear(), to.getMonth(), from.getDate())
-                if (to < newFrom && to.getMonth() === newFrom.getMonth() && to.getFullYear() % 4 !== 0) {
-                    months--
-                }
-            }
-            return months
-        }
 
-        async function calcMonth(d1) {
-            if (d1) {
-                const oldDay = Number(d1.substring(0, 2));
-                const oldMonth = Number(d1.substring(3, 5));
-                const oldYear = Number(d1.substring(6));
-                const fromNew = new Date(oldYear, oldMonth - 1, oldDay)
-                const date = new Date();
-                const year = date.getFullYear();
-                const month = date.getMonth();
-                const day = date.getDate();
-                const to = new Date(year, month, day)
-                return await diffInMonths(fromNew, to);
-            } else {
-                return 0
-            }
-        }
 
         function gatDataFromDb() {
             return callDb.searchSend().then(dataFromDb => {
@@ -85,25 +59,25 @@ class HomeSendGenerator {
             return object.link
         }
 
-        async function gatDataForSend() {
-            const newData = await callDb.searchSend();
-            const data = []
-            for (let i = 0; i < newData.length; i++) {
-                const fullMonth = await calcMonth(newData[i].dataValues.birthday_telegram)
-                for (let j = 0; j < kind.length; j++) {
-                    data.push({
-                        numberMonth: fullMonth,
-                        chatId: newData[i].dataValues.chatId,
-                        name: newData[i].dataValues.real_name_telegram,
-                        birthday: newData[i].dataValues.birthday_telegram,
-                        marker: `${kind[j]}${scheme[fullMonth]}`,
-                        indexVideo: await findLink(kind[j], scheme[fullMonth])
-                    })
-                }
-            }
-            console.log(data)
-            return data
-        }
+        // async function gatDataForSend() {
+        //     const newData = await callDb.searchSend();
+        //     const data = []
+        //     for (let i = 0; i < newData.length; i++) {
+        //         const fullMonth = await calcMonth(newData[i].dataValues.birthday_telegram)
+        //         for (let j = 0; j < kind.length; j++) {
+        //             data.push({
+        //                 numberMonth: fullMonth,
+        //                 chatId: newData[i].dataValues.chatId,
+        //                 name: newData[i].dataValues.real_name_telegram,
+        //                 birthday: newData[i].dataValues.birthday_telegram,
+        //                 marker: `${kind[j]}${scheme[fullMonth]}`,
+        //                 indexVideo: await findLink(kind[j], scheme[fullMonth])
+        //             })
+        //         }
+        //     }
+        //     console.log(data)
+        //     return data
+        // }
 
         const home = new BaseScene('home')
         home.enter(async (ctx) => {
