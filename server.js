@@ -7,8 +7,8 @@ const {Telegraf, Markup, Scenes, session} = require('telegraf')
 // const bot = new Telegraf(config.token);
 // "5858592661:AAGdzbUERIMeXsAANjKkONyCZDk56TDnON0"
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-const token_dev = "5858592661:AAGdzbUERIMeXsAANjKkONyCZDk56TDnON0"// test bot
-// const token_dev = "5739415913:AAG0e8F6BtVEFHusoIRix8wvkKN23RZpcsc" // main bot
+// const token_dev = "5858592661:AAGdzbUERIMeXsAANjKkONyCZDk56TDnON0"// test bot
+const token_dev = "5739415913:AAG0e8F6BtVEFHusoIRix8wvkKN23RZpcsc" // main bot
 const bot = new Telegraf(token_dev);
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 const token_helen = "5815175979:AAGXqlzqxeq9LCigysbmxrqmhVrsD76LGos" //helen_bot
