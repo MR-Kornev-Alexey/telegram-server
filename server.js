@@ -132,8 +132,7 @@ bot.hears('⌛ Домашние задания', async ctx => {
 bot.command('support', async (ctx) => ctx.replyWithHTML(`Вы можете написать в Службу поддержки Бота\n https://t.me/mrk_service`,
     await getClose()
 ))
-bot.command('support', async (ctx) => ctx.replyWithHTML(`Вы можете написать в Службу поддержки Бота\n https://t.me/mrk_service`
-))
+
 bot.hears('✏ Поддержка', async (ctx) => ctx.replyWithHTML(`Вы можете написать в Службу поддержки Бота\n https://t.me/mrk_service`
 ))
 
@@ -170,6 +169,10 @@ dream.action('data_reg', async (ctx) => {
 dream.command('check', async (ctx) => {
     await ctx.scene.enter('check');
 });
+dream.command('support', async (ctx) => ctx.replyWithHTML(`Вы можете написать в Службу поддержки Бота\n https://t.me/mrk_service`
+))
+dream.hears('✏ Поддержка', async (ctx) => ctx.replyWithHTML(`Вы можете написать в Службу поддержки Бота\n https://t.me/mrk_service`
+))
 
 
 helen.start(async (ctx) => {
