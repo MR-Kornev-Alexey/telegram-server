@@ -280,16 +280,16 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
 // simple route
-// app.get("/", (req, res) => {
-//     res.json({message: "Welcome! Alexey! Node"});
-// });
-const path = require('path');
-const public = path.join(__dirname, 'public');
-app.get('/', function(req, res) {
-    res.sendFile(path.join(public, 'index.html'));
+app.get("/", (req, res) => {
+    res.json({message: "Welcome! Alexey! Node"});
 });
-
-app.use('/', express.static(public));
+// const path = require('path');
+// const public = path.join(__dirname, 'public');
+// app.get('/', function(req, res) {
+//     res.sendFile(path.join(public, 'index.html'));
+// });
+//
+// app.use('/', express.static(public));
 
 
 const db = require("./models");
