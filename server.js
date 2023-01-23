@@ -57,23 +57,6 @@ function dataReducer(state = {data: []}, action) {
 const app = express();
 const store = createStore(dataReducer);
 
-
-// const checkScene = curScene.GenCheckScene(store, function (id) {
-//     callDb.updateUser(id, store.getState().data).then(result => {
-//         if (result === 123) {
-//             bot.telegram.sendMessage(id, `Успешное обновление`).then(r => {
-//             })
-//             bot.telegram.sendSticker(id, 'CAACAgIAAxkBAAEHK4pjuoKkGSffpgZH7FAMCxqOvdItxgACCh0AAsGoIEkIjTf-YvDReC0E').then(r => {
-//             })
-//         } else {
-//             bot.telegram.sendMessage(id, `Ошибка записи. Пожалуйста, повторите обновление данных`).then(r => {
-//             })
-//         }
-//
-//     })
-// });
-
-
 const stage = new Scenes.Stage([ageScene,
     nameScene, babyScene, checkScene, emailScene,
     startScene, sendingHome, locationScene, babyEditScene,
