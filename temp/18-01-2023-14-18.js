@@ -49,7 +49,7 @@ module.exports = [
     },
     {
         numberMonth: 17,
-        link: 'https://youtu.be/HYGGmvArkSc',// третье задание речь
+        link: 'https://youtu.be/HYGGmvArkSc',// третье задание речь speak 14 18 3
         numberWeek: 75,
         chatId: 1824765963,
         name: 'Надежда Леонтьева',

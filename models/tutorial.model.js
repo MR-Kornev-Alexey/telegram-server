@@ -38,6 +38,14 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.STRING,
             defaultValue: 'data not entered'
         },
+        location:{
+            type: Sequelize.STRING,
+            defaultValue: 'data not entered'
+        },
+        source:{
+                type: Sequelize.STRING,
+                defaultValue: 'data not entered'
+        },
         access_all: {
             type: Sequelize.BOOLEAN,
             defaultValue: false
@@ -61,7 +69,12 @@ module.exports = (sequelize, Sequelize) => {
         access_dream: {
             type: Sequelize.BOOLEAN,
             defaultValue: false
+        },
+        intensive: {
+            type: Sequelize.STRING,
+            defaultValue: 'no'
         }
+
     });
     const HomeworksWatch = sequelize.define('homeworksWatch', {
         userId: {
@@ -192,6 +205,32 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.STRING
         }
     });
+    const Sending = sequelize.define("sending", {
+        chatId: {
+            type: Sequelize.BIGINT,
+        },
+        name: {
+            type: Sequelize.STRING
+        },
+        birthday: {
+            type: Sequelize.STRING
+        },
+       numberMonth: {
+            type: Sequelize.INTEGER
+        },
+        numberWeek: {
+            type: Sequelize.INTEGER
+        },
+        link: {
+            type: Sequelize.TEXT
+        },
+        indexVideo: {
+            type: Sequelize.STRING
+        },
+        indexWeek: {
+            type: Sequelize.STRING
+        }
+    });
 
-    return { Tutorial, HomeworksMark, Intensive, SendBlocked, Helen};
+    return { Tutorial, HomeworksMark, Intensive, SendBlocked, Helen, Sending};
 };

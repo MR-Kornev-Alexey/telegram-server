@@ -1,4 +1,4 @@
-exports = [
+module.exports = [
     {
         numberMonth: 10,
         numberWeek: 47,
@@ -160,14 +160,14 @@ exports = [
         birthday: '07-03-2022'
     },
     {
-        numberMonth: -3,
-        numberWeek: 12,
-        indexVideo: 'emo-3-4-1',
-        link: 'https://youtu.be/5emKzpa-lDg',
-        indexWeek: '12-04',
+        numberMonth: 9,
+        numberWeek: 40,
+        indexVideo: 'emo-9-10-1',
+        link: 'https://youtu.be/sUNstp-Q4So',
+        indexWeek: '40-04',
         chatId: 442049365,
         name: 'Гензель Инна',
-        birthday: '16-04-2023'
+        birthday: '16-04-2022'
     },
     {
         numberMonth: 11,

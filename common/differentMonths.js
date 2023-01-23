@@ -32,7 +32,12 @@ exports.calculating = (d1) =>{
         const month = date.getMonth();
         const day = date.getDate();
         const to  = new Date(year,month, day)
-        return diffInMonths(fromNew, to);
+        const calc =  diffInMonths(fromNew, to);
+        if(calc) {
+            return calc
+        }
+        else {return "неполные данные"
+        }
     } else {
         return 0
     }

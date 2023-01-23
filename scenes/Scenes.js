@@ -1,57 +1,36 @@
 const { Scenes: { BaseScene }, Markup} = require('telegraf');
-let state = {}
-async function setState (input,data) {
-    state[input] = data
-    // console.log(state)
-}
-
-async function checkInput (data) {
-    // const regex = /^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-(2[1-4])$/
-    const regex = /^(0?[1-9]|[12][0-9]|3[01])-(0?[1-9]|1[0-2])-(20(20|21|22|23|24))$/
-    if (regex.test(data)) {
-        return ["", true]
-    } else {
-        const message = "Похоже, формат даты неправильный"
-        return [message,false]
-    }
-
-}
-async function checkEmail (data) {
-    const regex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/// Регулярное выражение для проверки формата
-    if (regex.test(data)) {
-        return ["", true]
-    } else {
-        const message = "Похоже, Вы ввели емейл неправильно"
-        return [message,false]
-    }
-
-}
-async function checkLetters (data) {
-    const regex = /^[a-zA-Zа-яА-Я]+(\s[a-zA-Zа-яА-Я]+)*$/
-
-    if (regex.test(data)) {
-        return ["", true]
-    } else {
-        const message = "Пожалуйста напишите имя или кириллицей или латиницей"
-        return [message,false]
-    }
-
-}
+const callDb = require("../controllers/tutorial.controller")
+const diffTime = require("../common/differentMonths");
 
 class SceneGenerator {
-     GenBabyScene () {
-        const baby = new BaseScene('baby')
-        state = {}
-        baby.enter(async (ctx) => {
-            await ctx.reply(`Введите, пожалуйста, имя ребенка`
-            )
-        })
+GenBabyScene () {
+    const baby = new BaseScene('baby')
+    baby.enter(async (ctx) => {
+        await ctx.reply(`Введите, пожалуйста, имя ребенка`
+        )
+    })
+   async function checkLetters(text) {
+             const regex = /^[a-zA-Zа-яА-Я]+(\s[a-zA-Zа-яА-Я]+)*$/
+             if (regex.test(text)) {
+                 return ["", true]
+             } else {
+                 const message = "Пожалуйста напишите имя или кириллицей или латиницей"
+                 return [message,false]
+             }
+         }
         baby.on('text', async (ctx) => {
+            let source = ctx.botInfo.id
             const checkData = await checkLetters(ctx.message.text)
+            let data = "no"
+            console.log("source" , source)
+            if(source === 5858592661 ){
+                data = "dream"
+            } else {
+                data = "intensive"
+            }
             if(checkData[1]){
-                await setState('chatId', ctx.message.from.id)
-                await setState('baby_name_telegram', ctx.message.text)
-                await ctx.scene.enter('age')
+                await callDb.getInDB(ctx.message.from.id, {"baby_name_telegram" : ctx.message.text , source: data})
+                 await ctx.scene.enter('age')
             } else {
                 await ctx.telegram.sendMessage( ctx.message.from.id, `${checkData[0]}`)
                 await ctx.scene.reenter()
@@ -63,6 +42,37 @@ class SceneGenerator {
         })
          return baby
     }
+    GenBabyEditScene () {
+        const edit_baby = new BaseScene('edit_baby')
+        edit_baby.enter(async (ctx) => {
+            await ctx.reply(`Введите заново имя ребенка`
+            )
+        })
+        async function checkLetters(text) {
+            const regex = /^[a-zA-Zа-яА-Я]+(\s[a-zA-Zа-яА-Я]+)*$/
+            if (regex.test(text)) {
+                return ["", true]
+            } else {
+                const message = "Пожалуйста напишите имя или кириллицей или латиницей"
+                return [message,false]
+            }
+        }
+        edit_baby.on('text', async (ctx) => {
+            const checkData = await checkLetters(ctx.message.text)
+            if(checkData[1]){
+                await callDb.getInDB(ctx.message.from.id, {"baby_name_telegram" : ctx.message.text})
+                await ctx.scene.enter('check')
+            } else {
+                await ctx.telegram.sendMessage( ctx.message.from.id, `${checkData[0]}`)
+                await ctx.scene.reenter()
+            }
+        })
+        edit_baby.on('message', async (ctx) => {
+            await ctx.reply('Это явно не имя')
+            await ctx.scene.reenter()
+        })
+        return edit_baby
+    }
 
     GenAgeScene () {
         const age = new BaseScene('age')
@@ -70,13 +80,24 @@ class SceneGenerator {
             await ctx.replyWithHTML(`Введите, пожалуйста, дату рождения ребенка в формате ДД-ММ-ГГГГ \n (Пример: <b>12-08-2022</b>)`
              )
         })
+        async function checkInput (data) {
+            // const regex = /^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-(2[1-4])$/
+            const regex = /^(0?[1-9]|[12][0-9]|3[01])-(0?[1-9]|1[0-2])-(20(20|21|22|23|24))$/
+            if (regex.test(data)) {
+                return ["", true]
+            } else {
+                const message = "Похоже, формат даты неправильный"
+                return [message,false]
+            }
+
+        }
         age.on('text', async (ctx) => {
                 const checkData = await checkInput(ctx.message.text)
                 if(checkData[1]){
-                    await setState('birthday_telegram', ctx.message.text)
+                    await callDb.getInDB(ctx.message.from.id, {"birthday_telegram" : ctx.message.text })
                     await ctx.scene.enter('name')
                 } else {
-                    await ctx.telegram.sendMessage( state.chatId, `${checkData[0]}\n Требуемый формат ДД-ММ-ГГГГ`)
+                    await ctx.reply(`${checkData[0]}\n Требуемый формат ДД-ММ-ГГГГ`)
                     await ctx.scene.reenter()
                 }
         })
@@ -87,16 +108,59 @@ class SceneGenerator {
         return age
     }
 
+    GenEditAgeScene () {
+        const edit_birthday = new BaseScene('edit_birthday')
+        edit_birthday.enter(async (ctx) => {
+            await ctx.replyWithHTML(`Введите ДР ребенка в формате ДД-ММ-ГГГГ\n(Пример: <b>12-08-2022</b>)`
+            )
+        })
+        async function checkInput (data) {
+            // const regex = /^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-(2[1-4])$/
+            const regex = /^(0?[1-9]|[12][0-9]|3[01])-(0?[1-9]|1[0-2])-(20(20|21|22|23|24))$/
+            if (regex.test(data)) {
+                return ["", true]
+            } else {
+                const message = "Похоже, формат даты неправильный"
+                return [message,false]
+            }
+
+        }
+        edit_birthday.on('text', async (ctx) => {
+            const checkData = await checkInput(ctx.message.text)
+            if(checkData[1]){
+                await callDb.getInDB(ctx.message.from.id, {"birthday_telegram" : ctx.message.text })
+                await ctx.scene.enter('check')
+            } else {
+                await ctx.reply(`${checkData[0]}\n Требуемый формат ДД-ММ-ГГГГ`)
+                await ctx.scene.reenter()
+            }
+        })
+        edit_birthday.on('message', async (ctx) => {
+            await ctx.reply('Это явно не день рождения')
+            await ctx.scene.reenter()
+        })
+        return edit_birthday
+    }
+
     GenNameScene () {
         const name = new BaseScene('name')
         name.enter(async (ctx) => {
-             await ctx.reply(`Представьтесь, пожалуйста.\nВведите, пожалуйста Ваше имя и фамилию`)
+             await ctx.reply(`Представьтесь, пожалуйста.\nВведите, пожалуйста Ваши имя и фамилию`)
         })
+        async function checkLetters(text) {
+            const regex = /^[a-zA-Zа-яА-Я]+(\s[a-zA-Zа-яА-Я]+)*$/
+            if (regex.test(text)) {
+                return ["", true]
+            } else {
+                const message = "Пожалуйста напишите имя или кириллицей или латиницей"
+                return [message,false]
+            }
+        }
         name.on('text', async (ctx) => {
             const checkData = await checkLetters(ctx.message.text)
             if(checkData[1]){
-                await setState('real_name_telegram', ctx.message.text)
-                await ctx.scene.enter('email')
+               await callDb.getInDB(ctx.message.from.id, {"real_name_telegram" : ctx.message.text })
+                await ctx.scene.enter('location')
             } else {
                 await ctx.telegram.sendMessage( ctx.message.from.id, `${checkData[0]}`)
                 await ctx.scene.reenter()
@@ -108,64 +172,277 @@ class SceneGenerator {
         })
         return name
     }
-    GenEmailScene () {
-        const email = new BaseScene('email')
-        email.enter(async (ctx) => {
-            await ctx.reply(`Введите, пожалуйста, емейл`)
+    GenEditNameScene () {
+        const edit_name = new BaseScene('edit_name')
+        edit_name.enter(async (ctx) => {
+            await ctx.reply(`Введите повторно Ваши имя и фамилию`)
         })
-        email.on('text', async (ctx) => {
-            const checkData = await checkEmail(ctx.message.text)
+        async function checkLetters(text) {
+            const regex = /^[a-zA-Zа-яА-Я]+(\s[a-zA-Zа-яА-Я]+)*$/
+            if (regex.test(text)) {
+                return ["", true]
+            } else {
+                const message = "Имя пишется или кириллицей или латиницей"
+                return [message,false]
+            }
+        }
+        edit_name.on('text', async (ctx) => {
+            const checkData = await checkLetters(ctx.message.text)
             if(checkData[1]){
-                await setState('email_telegram', ctx.message.text)
+                await callDb.getInDB(ctx.message.from.id, {"real_name_telegram" : ctx.message.text })
                 await ctx.scene.enter('check')
             } else {
                 await ctx.telegram.sendMessage( ctx.message.from.id, `${checkData[0]}`)
                 await ctx.scene.reenter()
             }
         })
+        edit_name.on('message', async (ctx) => {
+            await ctx.reply('Это явно не имя')
+            await ctx.scene.reenter()
+        })
+        return edit_name
+    }
+    GenLocationScene () {
+        const location = new BaseScene('location')
+        location.enter(async (ctx) => {
+            await ctx.reply(`Введите, пожалуйста, где Вы живете`)
+        })
+        async function checkLetters(text) {
+            const regex = /^[a-zA-Zа-яА-Я]+(\s[a-zA-Zа-яА-Я]+)*$/
+            if (regex.test(text)) {
+                return ["", true]
+            } else {
+                const message = "Пожалуйста напишите или кириллицей или латиницей"
+                return [message,false]
+            }
+        }
+        location.on('text', async (ctx) => {
+            const checkData = await checkLetters(ctx.message.text)
+            if(checkData[1]){
+                await callDb.getInDB(ctx.message.from.id, {"location" : ctx.message.text })
+                await ctx.scene.enter('email')
+            } else {
+                await ctx.telegram.sendMessage( ctx.message.from.id, `${checkData[0]}`)
+                await ctx.scene.reenter()
+            }
+        })
+        location.on('message', async (ctx) => {
+            await ctx.reply('И опять явно не то, что надо ')
+            await ctx.scene.reenter()
+        })
+        return location
+    }
+    GenEditLocationScene () {
+        const edit_location = new BaseScene('edit_location')
+        edit_location.enter(async (ctx) => {
+            await ctx.reply(`Введите повторно где Вы живете`)
+        })
+        async function checkLetters(text) {
+            const regex = /^[a-zA-Zа-яА-Я]+(\s[a-zA-Zа-яА-Я]+)*$/
+            if (regex.test(text)) {
+                return ["", true]
+            } else {
+                const message = "Пишется или кириллицей или латиницей"
+                return [message,false]
+            }
+        }
+        edit_location.on('text', async (ctx) => {
+            const checkData = await checkLetters(ctx.message.text)
+            if(checkData[1]){
+                await callDb.getInDB(ctx.message.from.id, {"location" : ctx.message.text })
+                await ctx.scene.enter('check')
+            } else {
+                await ctx.telegram.sendMessage( ctx.message.from.id, `${checkData[0]}`)
+                await ctx.scene.reenter()
+            }
+        })
+        edit_location.on('message', async (ctx) => {
+            await ctx.reply('И опять явно что-то не то')
+            await ctx.scene.reenter()
+        })
+        return edit_location
+    }
+    GenEmailScene () {
+        const email = new BaseScene('email')
+        email.enter(async (ctx) => {
+            await ctx.reply(`Введите, пожалуйста, email`)
+        })
+        async function checkEmail (data) {
+            const regex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/// Регулярное выражение для проверки формата
+            if (regex.test(data)) {
+                return ["", true]
+            } else {
+                const message = "Похоже, Вы ввели email неправильно"
+                return [message,false]
+            }
+
+        }
+        email.on('text', async (ctx) => {
+            const checkData = await checkEmail(ctx.message.text)
+            if(checkData[1]){
+                callDb.getInDB(ctx.message.from.id, {"email_telegram" : ctx.message.text })
+                    .then(async (result) => {
+                        // Execute next function if update was successful
+                        if (result) {
+                            await ctx.scene.enter('check')
+                        } else {
+                            await ctx.reply(`Похоже, ошибка`)
+                            await ctx.telegram.sendMessage(ctx.message.from.id, `${result}`)
+                            await ctx.scene.reenter()
+                        }
+                    })
+                    .catch(async (error) => {
+                        await ctx.telegram.sendMessage(ctx.message.from.id, `${checkData[0]}`)
+                        await ctx.scene.reenter()
+                    });
+            } else {
+                await ctx.telegram.sendMessage( ctx.message.from.id, `${checkData[0]}`)
+                await ctx.scene.reenter()
+            }
+        })
         email.on('message', async (ctx) => {
-            await ctx.reply('И опять неправильно!  Это явно не емейл.')
+            await ctx.reply('И опять неправильно!  Это явно не email.')
             await ctx.scene.reenter()
         })
         return email
     }
-    GenCheckScene (store, callback) {
+    GenEditEmailScene () {
+        const edit_email = new BaseScene('edit_email')
+        edit_email.enter(async (ctx) => {
+            await ctx.reply(`Введите, пожалуйста, email`)
+        })
+        async function checkEmail (data) {
+            const regex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/// Регулярное выражение для проверки формата
+            if (regex.test(data)) {
+                return ["", true]
+            } else {
+                const message = "Похоже, Вы ввели email неправильно"
+                return [message,false]
+            }
+
+        }
+        edit_email.on('text', async (ctx) => {
+            const checkData = await checkEmail(ctx.message.text)
+            if(checkData[1]){
+                callDb.getInDB(ctx.message.from.id, {"email_telegram" : ctx.message.text })
+                    .then(async (result) => {
+                        // Execute next function if update was successful
+                        if (result) {
+                            await ctx.scene.enter('check')
+                        } else {
+                            await ctx.reply(`Похоже, ошибка`)
+                            await ctx.telegram.sendMessage(ctx.message.from.id, `${result}`)
+                            await ctx.scene.reenter()
+                        }
+                    })
+                    .catch(async (error) => {
+                        await ctx.telegram.sendMessage(ctx.message.from.id, `${checkData[0]}`)
+                        await ctx.scene.reenter()
+                    });
+            } else {
+                await ctx.telegram.sendMessage( ctx.message.from.id, `${checkData[0]}`)
+                await ctx.scene.reenter()
+            }
+        })
+        edit_email.on('message', async (ctx) => {
+            await ctx.reply('И опять неправильно!  Это явно не email.')
+            await ctx.scene.reenter()
+        })
+        return edit_email
+    }
+    GenCheckScene () {
         const check = new BaseScene('check')
         check.enter(async (ctx) => {
-             await ctx.replyWithHTML(`<b>Проверьте, пожалуйста. введёные данные</b>
-             Имя ребенка: ${state.baby_name_telegram}
-             Дата рождения ребенка: ${state.birthday_telegram}
-             Ваше имя: ${state.real_name_telegram} 
-             Ваше емейл: ${state.email_telegram} 
-             `,
-                 Markup.inlineKeyboard([
-                     [Markup.button.callback("Верно", "yes"), Markup.button.callback("Неверно", "no")]
-                 ])
-             )
+            callDb.getOne(ctx.message.from).then(async (result) => {
+                ctx.replyWithMarkdown(
+                    `Проверьте Ваши данные:\n` +
+                    `*Имя ребенка* - ${result.baby_name_telegram}\n`+
+                    `*Дата рождения ребенка* - ${result.birthday_telegram}\n` +
+                    `*Число полных месяцев* - ${diffTime.calculating(result.birthday_telegram)}\n` +
+                    `*Ваши Имя и Фамилия* - ${result.real_name_telegram}\n` +
+                    `Вы живете в  ${result.location}\n` +
+                    `*Ваш email* - ${result.email_telegram}`,
+                    {
+                        reply_markup: {
+                            inline_keyboard: [
+                                [
+                                    { text: 'Изменить имя ребенка', callback_data: 'edit_baby' }
+                                ],
+                                [
+                                    { text: 'Изменить дату рождения ребенка', callback_data: 'edit_birthday' }
+                                ],
+                                [
+                                    { text: 'Изменить имя', callback_data: 'edit_name' }
+                                ],
+                                [
+                                    { text: 'Изменить локацию', callback_data: 'edit_location' }
+                                ],
+                                [
+                                    { text: 'Изменить email', callback_data: 'edit_email' }
+                                ],
+                                [
+                                    { text: 'Все верно', callback_data: 'yes' }
+                                ]
+                            ]
+                        }
+                    }
+                )
         })
+        }
+        )
+        check.action('edit_email', async (ctx) => {
+                await ctx.reply(`Пойдем исправлять email`)
+                const chatId = ctx.update.callback_query.from.id
+                const messageId = ctx.update.callback_query.message.message_id
+                await ctx.answerCbQuery()
+                await ctx.telegram.deleteMessage(chatId, messageId)
+                await ctx.scene.enter('edit_email')
+            }
+        )
+        check.action('edit_location', async (ctx) => {
+                await ctx.reply(`Пойдем исправлять место жительства`)
+                const chatId = ctx.update.callback_query.from.id
+                const messageId = ctx.update.callback_query.message.message_id
+                await ctx.answerCbQuery()
+                await ctx.telegram.deleteMessage(chatId, messageId)
+                await ctx.scene.enter('edit_location')
+            }
+        )
+        check.action('edit_name', async (ctx) => {
+                await ctx.reply(`Пойдем исправлять имя`)
+                const chatId = ctx.update.callback_query.from.id
+                const messageId = ctx.update.callback_query.message.message_id
+                await ctx.answerCbQuery()
+                await ctx.telegram.deleteMessage(chatId, messageId)
+                await ctx.scene.enter('edit_name')
+            }
+        )
 
-       check.action('yes', async (ctx) => {
+        check.action('edit_birthday', async (ctx) => {
+                await ctx.reply(`Пойдем редактировать ДР`)
+                const chatId = ctx.update.callback_query.from.id
+                const messageId = ctx.update.callback_query.message.message_id
                 await ctx.answerCbQuery()
-                await ctx.telegram.sendMessage( state.chatId, `Спасибо`)
-                // const transformedObj = {
-                //    [state.userId]: state
-                // };
-                // console.log('transformedObj - ')
-                // console.log(transformedObj)
-                store.dispatch({
-                type: 'ADD_DATA',
-                payload: state
-                });
-                callback(state.chatId)
-                await ctx.scene.leave()
+                await ctx.telegram.deleteMessage(chatId, messageId)
+                await ctx.scene.enter('edit_birthday')
             }
         )
-        check.action('no', async (ctx) => {
-                await ctx.answerCbQuery()
-                await ctx.reply(`Пойдем заново вводить`)
-                await ctx.scene.enter('baby')
+        check.action('edit_baby', async (ctx) => {
+            await ctx.reply(`Пойдем редактировать имя ребенка`)
+            const chatId = ctx.update.callback_query.from.id
+            const messageId = ctx.update.callback_query.message.message_id
+            await ctx.answerCbQuery()
+            await ctx.telegram.deleteMessage(chatId, messageId)
+            await ctx.scene.enter('edit_baby')
             }
         )
+        check.action('yes', async ctx => {
+            const chatId = ctx.update.callback_query.from.id
+            const messageId = ctx.update.callback_query.message.message_id
+            ctx.answerCbQuery()
+            await ctx.telegram.deleteMessage(chatId, messageId)
+            await ctx.scene.leave()
+        });
         return check
     }
 }

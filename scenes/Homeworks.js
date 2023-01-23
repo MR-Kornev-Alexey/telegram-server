@@ -10,14 +10,14 @@ const {
     finishSent
 } = require('../homeworks/index');
 const {getClose, getWatch} = require("../lib/keyboards");
-const callDb = require("../controllers/tutorial.controller")
+
 const homeworks_0_12 = require("../lib/dataHomeworks_0_12");
 const homeworks_14_30 = require("../lib/dataHomeworksMore");
+const callDb = require("../controllers/tutorial.controller")
 
 
 class HomeworksGenerator {
-
-    GenStartScene() {
+        GenStartScene() {
         const start = new BaseScene('start')
         start.enter(async (ctx) => {
            await callDb.getOneUser(ctx.message.from.id)

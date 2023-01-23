@@ -3,9 +3,13 @@ const msg = require("../common/messageForGroup")
 const group = require("../common/dataGroup")
 const arraySend = require("../lib/send_0_56")
 const homeworks_0_12 = require("../lib/dataHomeworks_0_12");
-const after57 = require("../lib/14-18")
-const checkFile = require("../temp/18-01-2023-14-18")
+const after57 = require("../temp/after57")
+const listAfter57 = require("../temp/homeworkafter57")
+const checkFile = require("../temp/23-01-2023-before57")
 const alex = require("../temp/alex")
+const homeworks_11_13 = require("../temp/11_13")
+const homeworks_14_19 = require("../temp/14_19")
+
 
 async function nextStep(ctx) {
     // await ctx.replyWithHTML(`<b>Добрый день ${ctx.message.from.first_name ? ctx.message.from.first_name : 'незнакомец'}!</b>`)
@@ -29,6 +33,10 @@ async function nextStep(ctx) {
         case "/all":
             await ctx.replyWithHTML(`<b>Команда all</b>`)
             break
+        case "/find":
+            await ctx.replyWithHTML(`<b>Команда find</b>`)//поиск незарегестрированных в ДЗ
+            await findHelenForSend(checkFile)
+            break
         case "/sending":
             await ctx.replyWithHTML(`<b>Команда sending</b>`)
             await transmitterHomeworks(ctx, arraySend)
@@ -36,6 +44,14 @@ async function nextStep(ctx) {
         case "/list":
             await ctx.replyWithHTML(`<b>Команда list</b>`) //создание листа для рассылки
             await createListOFSending(ctx, arraySend)
+            break
+        case "/sent20":
+            await ctx.replyWithHTML(`<b>Команда sent20</b>`) //создание листа для рассылки
+            await createListOFSending(ctx, arraySend)
+            break
+        case "/list57":
+            await ctx.replyWithHTML(`<b>Команда list57</b>`) //создание листа для рассылки
+            await createListOFSendingAfter56Week()
             break
         case "/message":
             await ctx.replyWithHTML(`<b>Команда message</b>`)
@@ -52,15 +68,19 @@ async function nextStep(ctx) {
             await ctx.replyWithHTML(`<b>Команда users</b>`)
             await checkUsersForReal(ctx, checkFile)
             break
+        case "/users57":
+            await ctx.replyWithHTML(`<b>Команда users57</b>`)
+            await checkUsersForReal(ctx, after57)
+            break
         case "/i20":
             await ctx.replyWithHTML(`<b>Команда i20</b>`)
-            // await sendUsersIntensive2_0(ctx, alex)
             await sendUsersIntensive2_0(ctx, checkFile)
+            // await sendUsersIntensive2_0(ctx, alex)
             break
         case "/i20_14":
             await ctx.replyWithHTML(`<b>Команда i20_14</b>`)
-            await sendUsersIntensive2_0_14(ctx, checkFile)
-            // await sendUsersIntensive2_0(ctx, checkFile)
+            await sendUsersIntensive2_0_14(ctx, after57, 9, homeworks_11_13, homeworks_14_19)
+            // await sendUsersIntensive2_0_14(ctx, alex, 9 , homeworks_11_13, homeworks_14_19)
             break
         case "Дружба":
             await ctx.telegram.sendSticker(ctx.message.from.id, 'CAACAgIAAxkBAAEHUQljx4G5gd7Xn9qG7_HilIy-1YYXQgACCh0AAsGoIEkIjTf-YvDReC0E')
@@ -75,6 +95,7 @@ async function nextStep(ctx) {
             await ctx.replyWithHTML(`<b>Непонятная команда\n Повторите, пожалуйста, ввод. </b>`)
     }
 }
+
 exports.mainCheckAdmin = async (ctx) => {
     const isAdmin = await checkUserAdmin(ctx.message.from);
     if (isAdmin) {
@@ -131,15 +152,15 @@ async function transmitterOneToMore(ctx, array, message, userId) {
 
 }
 
-async function calculateAllIndexOfLink(fullWeek){
+async function calculateAllIndexOfLink(fullWeek) {
     const today = new Date();
     const dayOfWeek = today.getUTCDay();
     // "id": "01-03",
     let indexLink = null
     if (fullWeek <= 9) {
-        indexLink = "0" + fullWeek + "-04"//"-0" + dayOfWeek
+        indexLink = "0" + fullWeek + "-0" + dayOfWeek
     } else {
-        indexLink = fullWeek + "-04"// "-0" + dayOfWeek
+        indexLink = fullWeek + "-0" + dayOfWeek
     }
     console.log(indexLink)
     return indexLink
@@ -148,8 +169,8 @@ async function calculateAllIndexOfLink(fullWeek){
 
 async function calculateLinkForSending(fullWeek, array) {
     let indexLink = await calculateAllIndexOfLink(fullWeek)
-    let object =  array.find(obj => obj.id === indexLink)
-    console.log('object ----', object)
+    let object = array.find(obj => obj.id === indexLink)
+    // console.log('object ----', object)
     return object
 }
 
@@ -230,7 +251,7 @@ async function transmitterMessageNew(ctx, arraySend, message) {
 }
 
 
-async function checkUsersForReal (ctx , arraySend) {
+async function checkUsersForReal(ctx, arraySend) {
     let allErrors = []
     for (let i = 0; i < arraySend.length; i++) {
         try {
@@ -249,44 +270,30 @@ async function checkUsersForReal (ctx , arraySend) {
     console.log(allErrors);
 }
 
-async function sendUsersIntensive2_0 (ctx, newArrayIntensive){
+async function sendUsersIntensive2_0(ctx, newArrayIntensive) {
     for (let i = 0; i < newArrayIntensive.length; i++) {
         setTimeout(() => {
-            try{
+            try {
                 ctx.telegram.getChatMember(newArrayIntensive[i].chatId, newArrayIntensive[i].chatId).then(async (chatMember) => {
                     // console.log("chatMember ----", chatMember.status)
                     if (chatMember.status === 'left' || chatMember.status === 'kicked' || chatMember.status === 'restricted') {
                         console.log('User is not available')
                     } else {
                         // console.log(newArrayIntensive[i])
-                        if (newArrayIntensive[i].linkSending !== "false") {
-                            try {
-                                await ctx.telegram.sendMessage(newArrayIntensive[i].chatId, `Доброго времени суток ${newArrayIntensive[i].name}\nРассылка от 18-01-2022.\n ` +
-                                    `Вашему ребенку ${newArrayIntensive[i].numberMonth} мес.?\n` +
-                                    `Немного дополнительной информации:\n` +
-                                    `Общий групповой чат для Интенсива 2023:\n` +
-                                    `https://t.me/+QXSTJdjmutw5MTM8\n\n` +
-                                    `Куратор группы Анастасия:\n` +
-                                    `https://t.me/curator_courses\n\n` +
-                                    `Собственно, домашнее задание на сегодня\n` +
-                                    `${newArrayIntensive[i].link}\n\n` +
-                                    `И последнее, анализ показал, что боты нужно разделить\n` +
-                                    `Поэтому прошу Вас подружиться с еще одним ботом. Для этого прошу зайти в него и запустить, нажав пуск\n`+
-                                    `https://t.me/helen_root_bot\n` +
-                                    `И наберите слово дружба`
-                                    
-                                )
-                                await ctx.replyWithHTML(`${newArrayIntensive[i].name} отправлено`)
-                            } catch (error) {
-                                if (error.response.error_code === 403) {
-                                    console.log(`Failed to send message to user ${newArrayIntensive[i].name} with chatId ${newArrayIntensive[i].chatId}. Error: ${error.response.description}`);
-                                }
-                                else if (error.response.error_code === 400) {
-                                    console.log(`Failed to send message to user ${newArrayIntensive[i].name} with chatId ${newArrayIntensive[i].chatId}. Error: ${error.response.description}`);
-                                }
-                                else {
-                                    console.log (error);
-                                }
+                        try {
+                            await ctx.telegram.sendMessage(newArrayIntensive[i].chatId, `Доброго времени суток ${newArrayIntensive[i].name}\n\nДЗ от 23-01-2022 (${newArrayIntensive[i].indexWeek})\n` +
+                                `\n` +
+                                `${newArrayIntensive[i].link}\n`
+                            )
+                            await callDb.saveSandingToDB(newArrayIntensive[i])
+                            await ctx.replyWithHTML(`${newArrayIntensive[i].name} отправлено`)
+                        } catch (error) {
+                            if (error.response.error_code === 403) {
+                                console.log(`Failed to send message to user ${newArrayIntensive[i].name} with chatId ${newArrayIntensive[i].chatId}. Error: ${error.response.description}`);
+                            } else if (error.response.error_code === 400) {
+                                console.log(`Failed to send message to user ${newArrayIntensive[i].name} with chatId ${newArrayIntensive[i].chatId}. Error: ${error.response.description}`);
+                            } else {
+                                console.log(error);
                             }
                         }
                     }
@@ -294,9 +301,8 @@ async function sendUsersIntensive2_0 (ctx, newArrayIntensive){
             } catch (error) {
                 if (error.response.error_code === 400) {
                     console.log(`Failed to send message to user ${newArrayIntensive[i].name} with chatId ${newArrayIntensive[i].chatId}. Error: ${error.response.description}`);
-                }
-                else {
-                    console.log (error);
+                } else {
+                    console.log(error);
                 }
             }
 
@@ -305,48 +311,41 @@ async function sendUsersIntensive2_0 (ctx, newArrayIntensive){
     await ctx.replyWithHTML(`Отправка закончена`)
 }
 
-async function sendUsersIntensive2_0_14 (ctx, newArrayIntensive){
+
+async function sendUsersIntensive2_0_14(ctx, newArrayIntensive, number, h13, h14) {
     for (let i = 0; i < newArrayIntensive.length; i++) {
         setTimeout(() => {
-            try{
+            try {
                 ctx.telegram.getChatMember(newArrayIntensive[i].chatId, newArrayIntensive[i].chatId).then(async (chatMember) => {
                     // console.log("chatMember ----", chatMember.status)
                     if (chatMember.status === 'left' || chatMember.status === 'kicked' || chatMember.status === 'restricted') {
                         console.log('User is not available')
                     } else {
-                        // console.log(newArrayIntensive[i])
-                        if (newArrayIntensive[i].linkSending !== "false") {
-                            try {
+                        try {
+                            if (newArrayIntensive[i].numberMonth === 13) {
                                 await ctx.telegram.sendMessage(newArrayIntensive[i].chatId,
-                                    `❤️ Повторно ❤️\n` +
-                                    `Доброго времени суток ${newArrayIntensive[i].name}\nРассылка от 18-01-2022.\n ` +
-                                    `Вашему ребенку ${newArrayIntensive[i].numberMonth} мес.?\n` +
-                                    `Немного дополнительной информации:\n` +
-                                    `На данном этапе у вас рассылка ДЗ будет 3 раза в неделю, далее нагрузка будет увеличиваться.\n` +
-                                    `Если Вам этого недостаточно или оно вам сложно, то Вы может взять еще ДЗ в разделе ДЗ в чат боте или в Web-приложении\n` +
-                                    `Общий групповой чат для Интенсива 2023:\n` +
-                                    `https://t.me/+QXSTJdjmutw5MTM8\n\n` +
-                                    `Куратор группы Анастасия:\n` +
-                                    `https://t.me/curator_courses\n\n` +
-                                    `Собственно, домашнее задание на сегодня\n` +
-                                    `${newArrayIntensive[i].link}\n\n` +
-                                    `И последнее, анализ показал, что боты нужно разделить\n` +
-                                    `Поэтому прошу Вас подружиться с еще одним ботом. Для этого прошу зайти в него и запустить, нажав пуск\n`+
-                                    `https://t.me/helen_root_bot\n` +
-                                    `И наберите слово дружба`
-
+                                    `❤️ Доброго времени суток ${newArrayIntensive[i].name}\n` +
+                                    `Вашему ребенку ${newArrayIntensive[i].numberMonth} мес.?\n\n` +
+                                    `ДЗ от 23-01-2022.\n ` +
+                                    `${h13[number].link}`
                                 )
-                                await ctx.replyWithHTML(`${newArrayIntensive[i].name} отправлено`)
-                            } catch (error) {
-                                if (error.response.error_code === 403) {
-                                    console.log(`Failed to send message to user ${newArrayIntensive[i].name} with chatId ${newArrayIntensive[i].chatId}. Error: ${error.response.description}`);
-                                }
-                                else if (error.response.error_code === 400) {
-                                    console.log(`Failed to send message to user ${newArrayIntensive[i].name} with chatId ${newArrayIntensive[i].chatId}. Error: ${error.response.description}`);
-                                }
-                                else {
-                                    console.log (error);
-                                }
+                            } else {
+                                await ctx.telegram.sendMessage(newArrayIntensive[i].chatId,
+                                    `❤️ Доброго времени суток ${newArrayIntensive[i].name}\n` +
+                                    `Вашему ребенку ${newArrayIntensive[i].numberMonth} мес.?\n\n` +
+                                    `ДЗ от 23-01-2022.\n ` +
+                                    `${h14[number].link}`
+                                )
+                            }
+                            await callDb.saveSandingToDB(newArrayIntensive[i])
+                            await ctx.replyWithHTML(` отправлено ${newArrayIntensive[i].name}`)
+                        } catch (error) {
+                            if (error.response.error_code === 403) {
+                                console.log(`Failed to send message to user ${newArrayIntensive[i].name} with chatId ${newArrayIntensive[i].chatId}. Error: ${error.response.description}`);
+                            } else if (error.response.error_code === 400) {
+                                console.log(`Failed to send message to user ${newArrayIntensive[i].name} with chatId ${newArrayIntensive[i].chatId}. Error: ${error.response.description}`);
+                            } else {
+                                console.log(error);
                             }
                         }
                     }
@@ -354,9 +353,8 @@ async function sendUsersIntensive2_0_14 (ctx, newArrayIntensive){
             } catch (error) {
                 if (error.response.error_code === 400) {
                     console.log(`Failed to send message to user ${newArrayIntensive[i].name} with chatId ${newArrayIntensive[i].chatId}. Error: ${error.response.description}`);
-                }
-                else {
-                    console.log (error);
+                } else {
+                    console.log(error);
                 }
             }
 
@@ -369,7 +367,7 @@ async function transmitterHomeworks(ctx, arraySend) {
     const newArrayIntensive = await gatDataForSend(arraySend)
     for (let i = 0; i < newArrayIntensive.length; i++) {
         setTimeout(() => {
-            try{
+            try {
                 ctx.telegram.getChatMember(newArrayIntensive[i].chatId, newArrayIntensive[i].chatId).then(async (chatMember) => {
                     // console.log("chatMember ----", chatMember.status)
                     if (chatMember.status === 'left' || chatMember.status === 'kicked' || chatMember.status === 'restricted') {
@@ -386,12 +384,10 @@ async function transmitterHomeworks(ctx, arraySend) {
                             } catch (error) {
                                 if (error.response.error_code === 403) {
                                     console.log(`Failed to send message to user ${newArrayIntensive[i].name} with chatId ${newArrayIntensive[i].chatId}. Error: ${error.response.description}`);
-                                }
-                                else if (error.response.error_code === 400) {
+                                } else if (error.response.error_code === 400) {
                                     console.log(`Failed to send message to user ${newArrayIntensive[i].name} with chatId ${newArrayIntensive[i].chatId}. Error: ${error.response.description}`);
-                                }
-                                else {
-                                    console.log (error);
+                                } else {
+                                    console.log(error);
                                 }
                             }
                         }
@@ -400,9 +396,8 @@ async function transmitterHomeworks(ctx, arraySend) {
             } catch (error) {
                 if (error.response.error_code === 400) {
                     console.log(`Failed to send message to user ${newArrayIntensive[i].name} with chatId ${newArrayIntensive[i].chatId}. Error: ${error.response.description}`);
-                }
-                else {
-                    console.log (error);
+                } else {
+                    console.log(error);
                 }
             }
 
@@ -412,15 +407,14 @@ async function transmitterHomeworks(ctx, arraySend) {
 }
 
 
-
 async function sortingBabyAfter56week() {
     const newData = await callDb.findAllIntensiveAll()
     const data = []
     for (let i = 0; i < newData.length; i++) {
         const fullMonth = await calculateMonthsSinceBirth(newData[i].dataValues.birthday_telegram)
         const fullWeek = await calculateWeeksSinceBirth(newData[i].dataValues.birthday_telegram)
-        if (fullWeek > 56 || fullWeek < 3 ) {
-                data.push({
+        if (fullWeek > 56 || fullWeek < 3) {
+            data.push({
                 numberMonth: fullMonth,
                 numberWeek: fullWeek,
                 chatId: newData[i].dataValues.chatId,
@@ -456,16 +450,39 @@ async function convertUserIntensive() {
     for (let i = 0; i < newArray.length; i++) {
         const user = await callDb.checkUserForIntensive(newArray[i].chatId)
         if (user) {
-            console.log("найден ---")
+            // console.log("найден ---", newArray[i].chatId ,"----", newArray[i].chatId)
         } else {
-            console.log(" не найден ---")
+            console.log("не найден ---", newArray[i].chatId, "----", newArray[i].chatId)
             await callDb.createUserForIntensive(newArray[i])
         }
     }
     // console.log(newArray)
 }
 
-async function createListOFSending (ctx, arraySend) {  //command is list
+async function findHelenForSend(arraySend) {
+    const newData = await callDb.findAllHelen()
+    const dataHelen = []
+    for (let i = 0; i < newData.length; i++) {
+        dataHelen.push(newData[i].dataValues.chatId)
+    }
+    // console.log("dataHelen ---", dataHelen)
+    const noFind = []
+    for (let i = 0; i < arraySend.length; i++) {
+        console.log(arraySend[i].chatId)
+        let object = dataHelen.find(item => item === arraySend[i].chatId)
+        // console.log('object', object)
+        if (object) {
+            // console.log('object ---- найден', object)
+        } else {
+            // console.log('object ---- не найден', object)
+            noFind.push(arraySend[i])
+        }
+
+    }
+    console.log("noFind ---", noFind)
+}
+
+async function createListOFSending(ctx, arraySend) {  //command is list
     const newData = await callDb.findAllIntensive()
     const data = []
     for (let i = 0; i < newData.length; i++) {
@@ -489,12 +506,32 @@ async function createListOFSending (ctx, arraySend) {  //command is list
     console.log("newData ---", data)
 }
 
+async function createListOFSendingAfter56Week() {  //command is list57
+    const newArray = await callDb.findAll()
+    const dataAfter57 = []
+    for (let i = 0; i < newArray.length; i++) {
+        const fullMonth = await calculateMonthsSinceBirth(newArray[i].dataValues.birthday_telegram)
+        const fullWeek = await calculateWeeksSinceBirth(newArray[i].dataValues.birthday_telegram)
+        if (fullWeek > 56) {
+            dataAfter57.push({
+                numberMonth: fullMonth,
+                numberWeek: fullWeek,
+                chatId: newArray[i].dataValues.chatId,
+                name: newArray[i].dataValues.real_name_telegram,
+                birthday: newArray[i].dataValues.birthday_telegram,
+                link: ""
+            })
+        }
+    }
+    console.log("newData ---", dataAfter57)
+}
+
 exports.checkUserHelen = (data) => {
     return new Promise((resolve, reject) => {
         callDb.findOneHelen(data.id)
             .then((idCheck) => {
                 if (idCheck) {
-                    console.log("idCheck ----",idCheck, "Пользователь найден")
+                    console.log("idCheck ----", idCheck, "Пользователь найден")
                     resolve(true); //Пользователь найден
                 } else {
                     console.log("Пользователь не найден")

@@ -66,6 +66,18 @@ exports.findAllIntensive = async (req, res) => {
             return err;
         });
 };
+exports.findAllHelen = async (req, res) => {
+    return await dataBot.Helen.findAll()
+        .then(user => {
+            // console.log(user)
+            return user;
+        })
+        .catch(err => {
+            console.log(err)
+            return err;
+        });
+};
+
 exports.findAllIntensiveAll = async (req, res) => {
     return await dataBot.Intensive.findAll()
         .then(user => {
@@ -215,6 +227,26 @@ exports.findOne = (data) => {
             });
     });
 };
+
+exports.getInDB = async (id, index) => {
+    return new Promise((resolve, reject) => {
+        dataBot.Tutorial.update(index, {
+            where: { chatId: id }
+        })
+            .then(result => {
+                if (result[0] > 0) {
+                    resolve(123);
+                } else {
+                    reject(456);
+                }
+            })
+            .catch(err => {
+                console.log(err);
+                reject(456);
+            });
+    });
+}
+
 exports.updateUser = (id,data) => {
     // console.log("id in update - " + id)
     // console.log(data)
@@ -257,6 +289,24 @@ exports.getOne = (data) => {
 };
 
 
+
+exports.saveSandingToDB =  async (user) => {
+    const newSending = {
+        chatId: user.chatId,
+        name:  user.name,
+        birthday: user.birthday,
+        numberMonth: user.numberMonth,
+        numberWeek: user.numberWeek,
+        link: user.link,
+        indexVideo: user.indexVideo,
+        indexWeek: user.numberWeek
+    };
+    await dataBot.Sending.create(newSending)
+        .catch(err => {
+            console.log(err)
+        })
+
+}
 
 // Delete a Tutorial with the specified id in the request
 exports.delete = (req, res) => {
