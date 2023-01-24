@@ -74,9 +74,9 @@ class HomeworksGenerator {
         start.action('watch', ctx => {
             const chatId = ctx.update.callback_query.message.chat.id
             const linkID = ctx.update.callback_query.message.text
-            console.log('chatId --' , chatId , 'linkID ---', linkID )
+            // console.log('chatId --' , chatId , 'linkID ---', linkID )
             let object = homeworks_0_12.find(obj => obj.link === linkID);
-            console.log(object)
+            // console.log(object)
             callDb.recordLink(chatId, object.id , linkID).then(async res => {
                 await ctx.telegram.sendMessage(chatId, await finishSent( true , linkID), await getWatch(true)).then(r => {
                 })
@@ -98,9 +98,9 @@ class HomeworksGenerator {
             if (lastFour === 'link') {
                 const userId = ctx.update.callback_query.from.id
                 const urlLink = await actionGetOneHomework(actionId)
-                console.log("The urlLink id is:", urlLink);
+                // console.log("The urlLink id is:", urlLink);
                 const result = await callDb.searchWatch({userId,urlLink})
-                console.log("result  --  ",result)
+                // console.log("result  --  ",result)
                 await ctx.telegram.sendMessage(userId, await finishSent(result,urlLink), await getWatch(result) ).then(r => {
                 })
             } else {
