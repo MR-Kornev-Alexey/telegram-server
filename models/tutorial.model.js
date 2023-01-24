@@ -231,6 +231,10 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.STRING
         }
     });
-
-    return { Tutorial, HomeworksMark, Intensive, SendBlocked, Helen, Sending};
+    const IndexOfSend57 = sequelize.define("index57", {
+        indexSent: {
+            type: Sequelize.INTEGER,
+        }
+    });
+    return { Tutorial, HomeworksMark, Intensive, SendBlocked, Helen, Sending, IndexOfSend57};
 };

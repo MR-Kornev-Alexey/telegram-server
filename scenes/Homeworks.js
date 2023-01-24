@@ -77,8 +77,8 @@ class HomeworksGenerator {
             console.log('chatId --' , chatId , 'linkID ---', linkID )
             let object = homeworks_0_12.find(obj => obj.link === linkID);
             console.log(object)
-            callDb.recordLink(chatId, object.id , linkID).then(async r => {
-                await ctx.telegram.sendMessage(chatId, await finishSent(true, linkID), await getWatch(true)).then(r => {
+            callDb.recordLink(chatId, object.id , linkID).then(async res => {
+                await ctx.telegram.sendMessage(chatId, await finishSent( true , linkID), await getWatch(true)).then(r => {
                 })
             }).catch(e =>{
                 console.log(e)
@@ -101,7 +101,6 @@ class HomeworksGenerator {
                 console.log("The urlLink id is:", urlLink);
                 const result = await callDb.searchWatch({userId,urlLink})
                 console.log("result  --  ",result)
-
                 await ctx.telegram.sendMessage(userId, await finishSent(result,urlLink), await getWatch(result) ).then(r => {
                 })
             } else {
@@ -110,10 +109,6 @@ class HomeworksGenerator {
             }
 
         });
-        // start.on('message', async (ctx) => {
-        //     await ctx.reply('Это явно не имя')
-        //     await ctx.scene.reenter()
-        // })
         return start
     }
 }

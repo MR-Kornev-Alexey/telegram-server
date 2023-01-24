@@ -1,6 +1,14 @@
 const {Scenes: {BaseScene}, Markup} = require('telegraf');
 const callDb = require("../controllers/tutorial.controller")
 const arraySend = require("../lib/send_0_56")
+const homeworks_11_13 = require("../temp/11_13")
+const homeworks_14_19 = require("../temp/14_19")
+const index13 = require("../temp/13")
+const index14 = require("../temp/14")
+const index15 = require("../temp/15")
+const index16 = require("../temp/16")
+const index17 = require("../temp/17")
+const index18 = require("../temp/18")
 
 class ScanHomeworkSceneGenerator {
     GenScanScene () {
@@ -94,16 +102,46 @@ class ScanHomeworkSceneGenerator {
             // console.log('object ----', arraySend[object - number])
             return arraySend[object - number]
         }
+
+        async function calculateMonthsSinceBirth(birthdate) {
+            let newBirthdate = await convertBirthdate(birthdate)
+            const today = new Date();
+            let months = (today.getFullYear() - newBirthdate.getFullYear()) * 12 + today.getMonth() - newBirthdate.getMonth();
+            if (today.getDate() < newBirthdate.getDate()) {
+                const newFrom = new Date(today.getFullYear(), today.getMonth(), newBirthdate.getDate())
+                if (today < newFrom && today.getMonth() === newFrom.getMonth() && today.getFullYear() % 4 !== 0) {
+                    months--
+                }
+            }
+            return months
+        }
+
         async function calcLink(chatId, number) {
             // console.log(chatId)
             const user = await callDb.checkUserForCommon(chatId)
             const fullWeek = await calculateWeeksSinceBirth(user.birthday_telegram)
+            const fullMonth = await calculateMonthsSinceBirth(user.birthday_telegram)
             if (fullWeek <= 56) {
                 const linkVideo = await calculateLinkForSending(fullWeek, number)
                 return linkVideo.link
                 }
-            else{
-                return 'Эта функция пока в процессе разработки.'
+            else {
+                const indexArrays = {
+                    13: index13,
+                    14: index14,
+                    15: index15,
+                    16: index16,
+                    17: index17,
+                    18: index18
+                }
+                const numberToday = await callDb.getNumber()
+                const indexHW = numberToday.dataValues.indexSent - number
+                console.log(numberToday.dataValues.indexSent)
+                if (indexArrays[fullMonth]) {
+                    return indexArrays[fullMonth][indexHW].link
+                } else {
+                    return 'Эта функция пока в процессе разработки.'
+                }
             }
         }
 

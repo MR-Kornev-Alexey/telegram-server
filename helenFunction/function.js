@@ -10,6 +10,12 @@ const alex = require("../temp/alex")
 const homeworks_11_13 = require("../temp/11_13")
 const homeworks_14_19 = require("../temp/14_19")
 const helpHelen = require("../common/helpHelen");
+const index13 = require("../temp/13")
+const index14 = require("../temp/14")
+const index15 = require("../temp/15")
+const index16 = require("../temp/16")
+const index17 = require("../temp/17")
+const index18 = require("../temp/18")
 
 exports.startStep = async (ctx) => {
     await checkUserHelen(ctx.message.from).then(async (result) => {
@@ -119,8 +125,8 @@ async function nextStep(ctx) {
             break
         case "/i20_14":
             await ctx.replyWithHTML(`<b>Команда i20_14</b>`)
-            await sendUsersIntensive2_0_14(ctx, after57, 9, homeworks_11_13, homeworks_14_19)
-            // await sendUsersIntensive2_0_14(ctx, alex, 9 , homeworks_11_13, homeworks_14_19)
+            await sendUsersIntensive2_0_14(ctx, after57, 10, "24 января 2023 года " )
+            await sendUsersIntensive2_0_14(ctx, alex, 10, "24 января 2023 года " )
             break
         default:
             await ctx.telegram.sendSticker(ctx.message.from.id, 'CAACAgIAAxkBAAEHUQtjx4Mrk8muB2BSyhVHqSko2ZZrQgACzBgAAntYUEmwTZrmztcawi0E')
@@ -334,7 +340,8 @@ async function sendUsersIntensive2_0(ctx, newArrayIntensive) {
 }
 
 
-async function sendUsersIntensive2_0_14(ctx, newArrayIntensive, number, h13, h14) {
+async function sendUsersIntensive2_0_14(ctx, newArrayIntensive, number, dayData ) {
+    await callDb.saveIndex57(number)
     for (let i = 0; i < newArrayIntensive.length; i++) {
         setTimeout(() => {
             try {
@@ -344,24 +351,58 @@ async function sendUsersIntensive2_0_14(ctx, newArrayIntensive, number, h13, h14
                         console.log('User is not available')
                     } else {
                         try {
-                            if (newArrayIntensive[i].numberMonth === 13) {
-                                await ctx.telegram.sendMessage(newArrayIntensive[i].chatId,
-                                    `❤️ Доброго времени суток ${newArrayIntensive[i].name}\n` +
-                                    `Вашему ребенку ${newArrayIntensive[i].numberMonth} мес.?\n\n` +
-                                    `ДЗ от 23-01-2022.\n ` +
-                                    `${h13[number].link}`
-                                )
-                                await callDb.saveSandingToDB(newArrayIntensive[i], h13[number].link)
-                            } else {
-                                await ctx.telegram.sendMessage(newArrayIntensive[i].chatId,
-                                    `❤️ Доброго времени суток ${newArrayIntensive[i].name}\n` +
-                                    `Вашему ребенку ${newArrayIntensive[i].numberMonth} мес.?\n\n` +
-                                    `ДЗ от 23-01-2022.\n ` +
-                                    `${h14[number].link}`
-                                )
-                                await callDb.saveSandingToDB(newArrayIntensive[i], h14[number].link)
-                            }
-
+                             switch (newArrayIntensive[i].numberMonth) {
+                                 case 13 :
+                                     await ctx.telegram.sendMessage(newArrayIntensive[i].chatId,
+                                         `❤️ Доброго времени суток ${newArrayIntensive[i].name}\n\n` +
+                                         `ДЗ от ${ dayData }\n ` +
+                                         `${index13[number].link}`
+                                     )
+                                     await callDb.saveSandingToDB(newArrayIntensive[i], index13[number].link)
+                                     break
+                                 case 14 :
+                                     await ctx.telegram.sendMessage(newArrayIntensive[i].chatId,
+                                         `❤️ Доброго времени суток ${newArrayIntensive[i].name}\n\n` +
+                                         `ДЗ от ${ dayData }\n ` +
+                                         `${index14[number].link}`
+                                     )
+                                     await callDb.saveSandingToDB(newArrayIntensive[i], index14[number].link)
+                                     break
+                                 case 15 :
+                                     await ctx.telegram.sendMessage(newArrayIntensive[i].chatId,
+                                         `❤️ Доброго времени суток ${newArrayIntensive[i].name}\n\n` +
+                                         `ДЗ от ${ dayData }\n ` +
+                                         `${index15[number].link}`
+                                     )
+                                     await callDb.saveSandingToDB(newArrayIntensive[i], index15[number].link)
+                                     break
+                                 case 16 :
+                                     await ctx.telegram.sendMessage(newArrayIntensive[i].chatId,
+                                         `❤️ Доброго времени суток ${newArrayIntensive[i].name}\n\n` +
+                                         `ДЗ от ${ dayData }\n ` +
+                                         `${index16[number].link}`
+                                     )
+                                     await callDb.saveSandingToDB(newArrayIntensive[i], index16[number].link)
+                                     break
+                                 case 17 :
+                                     await ctx.telegram.sendMessage(newArrayIntensive[i].chatId,
+                                         `❤️ Доброго времени суток ${newArrayIntensive[i].name}\n\n` +
+                                         `ДЗ от ${ dayData }\n ` +
+                                         `${index17[number].link}`
+                                     )
+                                     await callDb.saveSandingToDB(newArrayIntensive[i], index17[number].link)
+                                     break
+                                 case 18 :
+                                     await ctx.telegram.sendMessage(newArrayIntensive[i].chatId,
+                                         `❤️ Доброго времени суток ${newArrayIntensive[i].name}\n\n` +
+                                         `ДЗ от ${ dayData }\n ` +
+                                         `${index18[number].link}`
+                                     )
+                                     await callDb.saveSandingToDB(newArrayIntensive[i], index18[number].link)
+                                     break
+                                 default:
+                                     await ctx.replyWithHTML(`ошибка отправки ${newArrayIntensive[i].name} `)
+                             }
                             await ctx.replyWithHTML(` отправлено ${newArrayIntensive[i].name}`)
                         } catch (error) {
                             if (error.response.error_code === 403) {

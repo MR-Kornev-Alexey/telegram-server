@@ -1,4 +1,5 @@
 const db = require("../models");
+const {regexpToText} = require("nodemon/lib/utils");
 const dataBot = db.tutorials;
 const Op = db.Sequelize.Op;
 
@@ -107,9 +108,13 @@ exports.findAll = async (req, res) => {
         });
 };
 
-exports.searchWatch = async (req, res) =>{
-
-};
+exports.searchWatch = async (req, res) => {
+    const { userId, urlLink } = req;
+    const record = await dataBot.HomeworksMark.findOne({
+        where: { userId, content: urlLink }
+    });
+    return !!record;
+}
 exports.searchSend = async (req, res) =>{
     return await dataBot.Tutorial.findAll({ where: { access_dev_0_12: true }} )
         .then(data => {
@@ -149,7 +154,6 @@ async function findAndLogUser(data) {
     }
 }
 exports.recordLink = async (chatId, videoId , linkID) => {
-
     const user = await dataBot.HomeworksMark.findByPk(chatId)
     if (user) {
         const newUserWatch = {
@@ -170,7 +174,7 @@ exports.recordLink = async (chatId, videoId , linkID) => {
         console.log(`Пользователь не найден`);
         console.log('newUserWatch = ')
         console.log(newUserWatch)
-        await dataBot.HomeworksMark.create(newUserWatch)
+        return  await dataBot.HomeworksMark.create(newUserWatch)
             .catch(err => {
                 console.log(err)
             })
@@ -292,6 +296,24 @@ exports.getOne = (data) => {
 };
 
 
+exports.getNumber = async () => {
+    try {
+         return await dataBot.IndexOfSend57.findByPk(1);
+    } catch (err) {
+        console.log(err);
+        throw err;
+    }
+};
+
+exports.saveIndex57 = async (data) => {
+    await dataBot.IndexOfSend57.update({
+        indexSent: data
+    })
+        .catch(err => {
+            console.log(err)
+        })
+
+}
 
 exports.saveSandingToDB =  async (user, link) => {
     const newSending = {
