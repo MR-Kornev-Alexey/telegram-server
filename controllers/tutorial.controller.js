@@ -39,7 +39,10 @@ exports.checkUserForIntensive= async (id) => {
     const user = await dataBot.Intensive.findByPk(id);
     return !!user;
 }
-
+exports.checkUserForCommon = async (id) => {
+    const user = await dataBot.Tutorial.findByPk(id);
+    return user.dataValues;
+}
 exports.createUserForIntensive = async (data) => {
     const newUser = {
         email_telegram: data.email,
@@ -290,14 +293,14 @@ exports.getOne = (data) => {
 
 
 
-exports.saveSandingToDB =  async (user) => {
+exports.saveSandingToDB =  async (user, link) => {
     const newSending = {
         chatId: user.chatId,
         name:  user.name,
         birthday: user.birthday,
         numberMonth: user.numberMonth,
         numberWeek: user.numberWeek,
-        link: user.link,
+        link: link,
         indexVideo: user.indexVideo,
         indexWeek: user.numberWeek
     };

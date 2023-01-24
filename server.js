@@ -20,11 +20,15 @@ const {createStore} = require('redux');
 const SceneGenerator = require('./scenes/Scenes')
 const HomeworksGenerator = require('./scenes/Homeworks')
 const HomeSendGenerator = require('./scenes/Send')
+const ScanHomeworkSceneGenerator = require('./scenes/ScanHomeworksScenes')
 const curScene = new SceneGenerator()
 const homeScene = new HomeworksGenerator()
 const sendScene = new HomeSendGenerator()
+const scanHomeScene =  new ScanHomeworkSceneGenerator()
 const sendingHome = sendScene.GenHomeScene()
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 const startScene = homeScene.GenStartScene()
+const scanScene = scanHomeScene.GenScanScene()
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 const ageScene = curScene.GenAgeScene()
 const ageEditScene = curScene.GenEditAgeScene()
@@ -60,11 +64,13 @@ const store = createStore(dataReducer);
 const stage = new Scenes.Stage([ageScene,
     nameScene, babyScene, checkScene, emailScene,
     startScene, sendingHome, locationScene, babyEditScene,
-    ageEditScene, nameEditScene, emailEditScene, locationEditScene])
+    ageEditScene, nameEditScene, emailEditScene, locationEditScene, scanScene])
 bot.use(session())
 bot.use(stage.middleware())
 dream.use(session())
 dream.use(stage.middleware())
+helen.use(session())
+helen.use(stage.middleware())
 
 const corsOptions = {
     origin: "http://localhost:8081"
@@ -129,11 +135,19 @@ bot.command('homeworks', async ctx => {
 bot.hears('⌛ Домашние задания', async ctx => {
     await ctx.scene.enter('start');
 });
-bot.command('support', async (ctx) => ctx.replyWithHTML(`Вы можете написать в Службу поддержки Бота\n https://t.me/mrk_service`,
+
+bot.hears('🌒 Работа со сном', async ctx => {
+    ctx.reply(`Скоро откроем доступ. Просим набраться терпения` )
+});
+bot.hears('✉️  Рассылка', async ctx => {
+      await ctx.scene.enter('scan');
+});
+
+bot.command('support', async (ctx) => ctx.reply(`Вы можете написать в Службу поддержки Бота\n https://t.me/mrk_service`,
     await getClose()
 ))
 
-bot.hears('✏ Поддержка', async (ctx) => ctx.replyWithHTML(`Вы можете написать в Службу поддержки Бота\n https://t.me/mrk_service`
+bot.hears('✏ Поддержка', async (ctx) => ctx.reply(`Вы можете написать в Службу поддержки Бота\n https://t.me/mrk_service`
 ))
 
 
@@ -174,105 +188,15 @@ dream.command('support', async (ctx) => ctx.replyWithHTML(`Вы можете н�
 dream.hears('✏ Поддержка', async (ctx) => ctx.replyWithHTML(`Вы можете написать в Службу поддержки Бота\n https://t.me/mrk_service`
 ))
 
-
+//++++++++++++++++++++++++++++++++++++++++++++++++++
 helen.start(async (ctx) => {
-    await HelenFunction.checkUserHelen(ctx.message.from).then(async (result) => {
-        if (result) {
-            await ctx.replyWithHTML(
-                `<b>Добрый день ${ctx.message.from.first_name ? ctx.message.from.first_name : 'незнакомец'}!</b>\nВы уже подружились со мной.\nЖдите ДЗ согласно графику.`,
-            )
-        } else {
-            await ctx.replyWithHTML(
-                `<b>Добрый день ${ctx.message.from.first_name ? ctx.message.from.first_name : 'незнакомец'}!</b>\nПодружитесь, пожалуйста со мной, отправив мне слово дружба`,
-            )
-        }
-    }).catch(e => {
-        console.log(e)
-    })
+    await HelenFunction.startStep (ctx)
 })
-
 helen.on('message', async (ctx) => {
     // console.log(ctx.message)
-    switch (ctx.message.text) {
-        case '/support':
-            ctx.replyWithHTML(`Вы можете написать в Службу поддержки Бота\nhttps://t.me/mrk_service`)
-            break
-        case '/help':
-            await ctx.replyWithHTML(helpHelen.help)
-            await ctx.telegram.sendSticker(ctx.message.from.id, 'CAACAgIAAxkBAAEHLnBju3AHWWk_-r_jjHgXlXAl16HJugACwxMAAm3oEEqGY8B94dy6NC0E')
-            break
-        default :
-            await HelenFunction.mainCheckAdmin(ctx)
-    }
+    await HelenFunction.firstStep(ctx)
 })
-
-helen.start(async (ctx) => {
-    checkUser(ctx.message.from).then(async (result) => {
-        if (result) {
-            await ctx.replyWithHTML(
-                `<b>Добрый день ${ctx.message.from.first_name ? ctx.message.from.first_name : 'незнакомец'}!</b>\nВы можете проверить свои данные, нажав на "Проверить данные" в меню`,
-            )
-        } else {
-            await ctx.replyWithHTML(
-                `<b>Добрый день ${ctx.message.from.first_name ? ctx.message.from.first_name : 'незнакомец'}!</b>\nПройдите,пожалуйста процедуру регистрации, нажав "Регистрация ребенка" в меню`,
-            )
-        }
-    }).catch(e => {
-        console.log(e)
-    })
-
-})
-
-
-async function checkAndReply(ctx) {
-    checkUser(ctx.message.from)
-        .then(async (result) => {
-            if (result) {
-                callDb.getOne(ctx.message.from).then(async (result) => {
-                        // console.log('result -- ');
-                        // console.log(result);
-                        await ctx.replyWithHTML(
-                            `<b>${ctx.message.from.first_name ? ctx.message.from.first_name : 'незнакомец'}!</b>\n` +
-                            `<b>Ваши данные:</b>\n` +
-                            `<b>Имя ребенка</b> - ${result.baby_name_telegram}\n` +
-                            `<b>Дата рождения ребенка</b> - ${result.birthday_telegram}\n` +
-                            `<b>Число полных месяцев</b> - ${diffTime.calculating(result.birthday_telegram)}\n` +
-                            `<b>Ваши Имя и Фамилия</b> - ${result.real_name_telegram}\n` +
-                            `<b>Ваш емейл</b> - ${result.email_telegram}`,
-                            Markup.inlineKeyboard([
-                                [Markup.button.callback("Верно", "right"), Markup.button.callback("Изменить", "update")]
-                            ])
-                        )
-//++++++++++++++++++++++++++++++++++++++
-                        bot.on('callback_query', async (callbackQuery) => {
-                            // console.log('callback_query event', callbackQuery);
-                            const action = callbackQuery.update.callback_query.data;
-                            // console.log('callback_query data ---- ', callbackQuery.from.id);
-                            const userId = callbackQuery.from.id;
-                            const ctx = callbackQuery;
-                            if (action === 'right') {
-                                // console.log('right action -- ' + result.chatId);
-                                await ctx.answerCbQuery();
-                                await ctx.telegram.sendSticker(userId, 'CAACAgIAAxkBAAEHK09julSXNlyU_2jfoNEsGktOpMn6rQACsAEAAhZCawpyXcYrBVvoaC0E')
-                            } else if (action === 'update') {
-                                // console.log('update action');
-                                await ctx.answerCbQuery();
-                                await ctx.telegram.sendMessage(userId, `Пойдем обновлять данные`)
-                                await ctx.scene.enter('baby');
-                            }
-                        });
-//=====================================
-                    }
-                )
-
-            } else {
-                await ctx.scene.enter('baby');
-            }
-        }).catch(e => {
-        console.log(e)
-    })
-}
-
+//+++++++++++++++++++++++++++++++++++++++++++++++++++
 // parse requests of content-type - application/json
 app.use(express.json());
 
@@ -313,6 +237,8 @@ process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
 process.once('SIGINT', () => helen.stop('SIGINT'));
 process.once('SIGTERM', () => helen.stop('SIGTERM'));
+process.once('SIGINT', () => dream.stop('SIGINT'));
+process.once('SIGTERM', () => dream.stop('SIGTERM'));
 //============================================================================
 
 // set port, listen for requests

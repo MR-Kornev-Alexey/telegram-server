@@ -5,12 +5,52 @@ const arraySend = require("../lib/send_0_56")
 const homeworks_0_12 = require("../lib/dataHomeworks_0_12");
 const after57 = require("../temp/after57")
 const listAfter57 = require("../temp/homeworkafter57")
-const checkFile = require("../temp/23-01-2023-before57")
+const checkFile = require("../temp/24-01-2023-before-56")
 const alex = require("../temp/alex")
 const homeworks_11_13 = require("../temp/11_13")
 const homeworks_14_19 = require("../temp/14_19")
+const helpHelen = require("../common/helpHelen");
 
-
+exports.startStep = async (ctx) => {
+    await checkUserHelen(ctx.message.from).then(async (result) => {
+        if (result) {
+            await ctx.replyWithHTML(
+                `<b>Добрый день ${ctx.message.from.first_name ? ctx.message.from.first_name : 'незнакомец'}!</b>\nВы уже подружились со мной.\nЖдите ДЗ согласно графику.`,
+            )
+        } else {
+            await ctx.replyWithHTML(
+                `<b>Добрый день ${ctx.message.from.first_name ? ctx.message.from.first_name : 'незнакомец'}!</b>\nПодружитесь, пожалуйста со мной, отправив мне слово дружба`,
+            )
+        }
+    }).catch(e => {
+        console.log(e)
+    })
+}
+exports.firstStep = async (ctx) => {
+    switch (ctx.message.text) {
+        case '/support':
+            ctx.replyWithHTML(`Вы можете написать в Службу поддержки Бота\nhttps://t.me/mrk_service`)
+            break
+        case '/help':
+            await ctx.replyWithHTML(helpHelen.help)
+            await ctx.telegram.sendSticker(ctx.message.from.id, 'CAACAgIAAxkBAAEHLnBju3AHWWk_-r_jjHgXlXAl16HJugACwxMAAm3oEEqGY8B94dy6NC0E')
+            break
+        case "Дружба":
+            await ctx.telegram.sendSticker(ctx.message.from.id, 'CAACAgIAAxkBAAEHUQljx4G5gd7Xn9qG7_HilIy-1YYXQgACCh0AAsGoIEkIjTf-YvDReC0E')
+            await ctx.replyWithHTML(`<b>Спасибо</b>`)
+            break
+        case "дружба":
+            await ctx.telegram.sendSticker(ctx.message.from.id, 'CAACAgIAAxkBAAEHUQljx4G5gd7Xn9qG7_HilIy-1YYXQgACCh0AAsGoIEkIjTf-YvDReC0E')
+            await ctx.replyWithHTML(`<b>Спасибо</b>`)
+            break
+        case "/homeworks":
+            await ctx.replyWithHTML(`<b>Домашние задания следует смотреть в Helen Bot.</b>\n\n` +
+                `Вам сюда https://t.me/mrk_new_bot`)
+            break
+        default :
+            await mainCheckAdmin(ctx)
+    }
+}
 async function nextStep(ctx) {
     // await ctx.replyWithHTML(`<b>Добрый день ${ctx.message.from.first_name ? ctx.message.from.first_name : 'незнакомец'}!</b>`)
     switch (ctx.message.text) {
@@ -82,40 +122,22 @@ async function nextStep(ctx) {
             await sendUsersIntensive2_0_14(ctx, after57, 9, homeworks_11_13, homeworks_14_19)
             // await sendUsersIntensive2_0_14(ctx, alex, 9 , homeworks_11_13, homeworks_14_19)
             break
-        case "Дружба":
-            await ctx.telegram.sendSticker(ctx.message.from.id, 'CAACAgIAAxkBAAEHUQljx4G5gd7Xn9qG7_HilIy-1YYXQgACCh0AAsGoIEkIjTf-YvDReC0E')
-            await ctx.replyWithHTML(`<b>Спасибо</b>`)
-            break
-        case "дружба":
-            await ctx.telegram.sendSticker(ctx.message.from.id, 'CAACAgIAAxkBAAEHUQljx4G5gd7Xn9qG7_HilIy-1YYXQgACCh0AAsGoIEkIjTf-YvDReC0E')
-            await ctx.replyWithHTML(`<b>Спасибо</b>`)
-            break
         default:
             await ctx.telegram.sendSticker(ctx.message.from.id, 'CAACAgIAAxkBAAEHUQtjx4Mrk8muB2BSyhVHqSko2ZZrQgACzBgAAntYUEmwTZrmztcawi0E')
             await ctx.replyWithHTML(`<b>Непонятная команда\n Повторите, пожалуйста, ввод. </b>`)
     }
 }
 
-exports.mainCheckAdmin = async (ctx) => {
+ mainCheckAdmin = async (ctx) => {
     const isAdmin = await checkUserAdmin(ctx.message.from);
     if (isAdmin) {
         await nextStep(ctx)
     } else {
         switch (ctx.message.text) {
-            case "Дружба":
-                await ctx.telegram.sendSticker(ctx.message.from.id, 'CAACAgIAAxkBAAEHUQljx4G5gd7Xn9qG7_HilIy-1YYXQgACCh0AAsGoIEkIjTf-YvDReC0E')
-                await ctx.replyWithHTML(`<b>Спасибо</b>`)
-                break
-            case "дружба":
-                await ctx.telegram.sendSticker(ctx.message.from.id, 'CAACAgIAAxkBAAEHUQljx4G5gd7Xn9qG7_HilIy-1YYXQgACCh0AAsGoIEkIjTf-YvDReC0E')
-                await ctx.replyWithHTML(`<b>Спасибо</b>`)
-                break
             default:
                 await ctx.telegram.sendSticker(ctx.message.from.id, 'CAACAgIAAxkBAAEHUQtjx4Mrk8muB2BSyhVHqSko2ZZrQgACzBgAAntYUEmwTZrmztcawi0E')
                 await ctx.reply('Я это слово пока еще не знаю.\nПока я отравляю только ДЗ\nМожете написать в поддержку\nhttps://t.me/mrk_service')
         }
-
-
     }
 }
 
@@ -134,14 +156,14 @@ async function checkUserAdmin(data) {
 }
 
 async function transmitterOneToMore(ctx, array, message, userId) {
-    console.log("array.length -- ", array.length)
+    // console.log("array.length -- ", array.length)
     for (let i = 0; i < array.length; i++) {
         ctx.telegram.getChatMember(array[i].id, userId).then(async (chatMember) => {
-            console.log("chatMember ----", chatMember.status)
+            // console.log("chatMember ----", chatMember.status)
             if (chatMember.status === 'left' || chatMember.status === 'kicked' || chatMember.status === 'restricted') {
-                console.log('User is not available')
+                // console.log('User is not available')
             } else {
-                console.log(array[i])
+                // console.log(array[i])
                 await ctx.replyWithHTML(
                     `<b>${ctx.message.from.first_name ? ctx.message.from.first_name : 'незнакомец'}!</b>\n В ${array[i].title} отправлено`)
                 await ctx.telegram.sendMessage(array[i].id, `Привет участникам группы ${array[i].title}.\n${message}\n`)
@@ -281,11 +303,11 @@ async function sendUsersIntensive2_0(ctx, newArrayIntensive) {
                     } else {
                         // console.log(newArrayIntensive[i])
                         try {
-                            await ctx.telegram.sendMessage(newArrayIntensive[i].chatId, `Доброго времени суток ${newArrayIntensive[i].name}\n\nДЗ от 23-01-2022 (${newArrayIntensive[i].indexWeek})\n` +
+                            await ctx.telegram.sendMessage(newArrayIntensive[i].chatId, `Доброго времени суток ${newArrayIntensive[i].name}\n\nДЗ от 24-01-2023 (${newArrayIntensive[i].indexWeek})\n` +
                                 `\n` +
                                 `${newArrayIntensive[i].link}\n`
                             )
-                            await callDb.saveSandingToDB(newArrayIntensive[i])
+                            await callDb.saveSandingToDB(newArrayIntensive[i], newArrayIntensive[i].link)
                             await ctx.replyWithHTML(`${newArrayIntensive[i].name} отправлено`)
                         } catch (error) {
                             if (error.response.error_code === 403) {
@@ -329,6 +351,7 @@ async function sendUsersIntensive2_0_14(ctx, newArrayIntensive, number, h13, h14
                                     `ДЗ от 23-01-2022.\n ` +
                                     `${h13[number].link}`
                                 )
+                                await callDb.saveSandingToDB(newArrayIntensive[i], h13[number].link)
                             } else {
                                 await ctx.telegram.sendMessage(newArrayIntensive[i].chatId,
                                     `❤️ Доброго времени суток ${newArrayIntensive[i].name}\n` +
@@ -336,8 +359,9 @@ async function sendUsersIntensive2_0_14(ctx, newArrayIntensive, number, h13, h14
                                     `ДЗ от 23-01-2022.\n ` +
                                     `${h14[number].link}`
                                 )
+                                await callDb.saveSandingToDB(newArrayIntensive[i], h14[number].link)
                             }
-                            await callDb.saveSandingToDB(newArrayIntensive[i])
+
                             await ctx.replyWithHTML(` отправлено ${newArrayIntensive[i].name}`)
                         } catch (error) {
                             if (error.response.error_code === 403) {
@@ -526,7 +550,7 @@ async function createListOFSendingAfter56Week() {  //command is list57
     console.log("newData ---", dataAfter57)
 }
 
-exports.checkUserHelen = (data) => {
+ checkUserHelen = (data) => {
     return new Promise((resolve, reject) => {
         callDb.findOneHelen(data.id)
             .then((idCheck) => {

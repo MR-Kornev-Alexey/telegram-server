@@ -17,6 +17,7 @@ diffInMonths = (from, to) => {
     return months
 }
 
+
 exports.calculating = (d1) =>{
 // Извлекаем день, месяц и год
     if(d1){
