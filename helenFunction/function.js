@@ -16,6 +16,10 @@ const index15 = require("../temp/15")
 const index16 = require("../temp/16")
 const index17 = require("../temp/17")
 const index18 = require("../temp/18")
+const DateConverter = require('../common/DateConverter');
+const {actionGetOneHomework, finishSent, homeworksList} = require("../homeworks");
+const {getWatch} = require("../lib/keyboards");
+const convert = new DateConverter()
 
 exports.startStep = async (ctx) => {
     await checkUserHelen(ctx.message.from).then(async (result) => {
@@ -73,8 +77,10 @@ async function nextStep(ctx) {
             await ctx.replyWithHTML(`<b>Команда intensive22</b>`)
             await transmitterOneToMore(ctx, group.intensive22, msg.intensive22, group.helenBotId)
             break
-        case "/intensiveAll":
-            await ctx.replyWithHTML(`<b>Команда intensive22</b>`)
+        case "/look20":
+            await ctx.replyWithHTML(`<b>Команда look20</b>`)
+            // await lookForSent(ctx)
+            await ctx.scene.enter('look');
             break
         case "/all":
             await ctx.replyWithHTML(`<b>Команда all</b>`)
@@ -133,6 +139,27 @@ async function nextStep(ctx) {
             await ctx.replyWithHTML(`<b>Непонятная команда\n Повторите, пожалуйста, ввод. </b>`)
     }
 }
+async function  lookForSent(ctx){
+    await ctx.replyWithHTML(`<b>Выберите участника</b>`)
+    const listOfLook =  await callDb.findAllIntensive2_0()
+    // console.log(listOfLook)
+    for (let i = 0; i < listOfLook.length; i++) {
+        // console.log(listOfLook[i].dataValues)
+        await ctx.reply(`${listOfLook[i].dataValues.real_name_telegram}`,
+            {
+                reply_markup: {
+                    inline_keyboard: [
+                        [
+                            { text: `Выбрать`, callback_data: listOfLook[i].dataValues.chatId }
+                        ]
+                    ]
+                }
+            }
+
+        )
+}
+}
+
 
  mainCheckAdmin = async (ctx) => {
     const isAdmin = await checkUserAdmin(ctx.message.from);

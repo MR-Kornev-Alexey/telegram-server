@@ -17,19 +17,12 @@ const token_helen = "5815175979:AAGXqlzqxeq9LCigysbmxrqmhVrsD76LGos" //helen_bot
 const helen = new Telegraf(token_helen);
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 const {createStore} = require('redux');
-const SceneGenerator = require('./scenes/Scenes')
+
 const HomeworksGenerator = require('./scenes/Homeworks')
 const HomeSendGenerator = require('./scenes/Send')
-const ScanHomeworkSceneGenerator = require('./scenes/ScanHomeworksScenes')
+
+const SceneGenerator = require('./scenes/Scenes')
 const curScene = new SceneGenerator()
-const homeScene = new HomeworksGenerator()
-const sendScene = new HomeSendGenerator()
-const scanHomeScene =  new ScanHomeworkSceneGenerator()
-const sendingHome = sendScene.GenHomeScene()
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-const startScene = homeScene.GenStartScene()
-const scanScene = scanHomeScene.GenScanScene()
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 const ageScene = curScene.GenAgeScene()
 const ageEditScene = curScene.GenEditAgeScene()
 const nameScene = curScene.GenNameScene()
@@ -41,6 +34,22 @@ const emailEditScene = curScene.GenEditEmailScene()
 const locationScene = curScene.GenLocationScene()
 const locationEditScene = curScene.GenEditLocationScene()
 const checkScene = curScene.GenCheckScene()
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+const homeScene = new HomeworksGenerator()
+const sendScene = new HomeSendGenerator()
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+const LookHomeworkSceneGenerator = require('./scenes/LookHomeworks')
+const lookSceneCommon = new LookHomeworkSceneGenerator()
+const lookScene = lookSceneCommon.GenLookScene()
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+const ScanHomeworkSceneGenerator = require('./scenes/ScanHomeworksScenes')
+const scanHomeScene =  new ScanHomeworkSceneGenerator()
+const sendingHome = sendScene.GenHomeScene()
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+const startScene = homeScene.GenStartScene()
+const scanScene = scanHomeScene.GenScanScene()
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 const callDb = require("./controllers/tutorial.controller")
 const diffTime = require("./common/differentMonths")
@@ -64,7 +73,7 @@ const store = createStore(dataReducer);
 const stage = new Scenes.Stage([ageScene,
     nameScene, babyScene, checkScene, emailScene,
     startScene, sendingHome, locationScene, babyEditScene,
-    ageEditScene, nameEditScene, emailEditScene, locationEditScene, scanScene])
+    ageEditScene, nameEditScene, emailEditScene, locationEditScene, scanScene, lookScene])
 bot.use(session())
 bot.use(stage.middleware())
 dream.use(session())
@@ -135,6 +144,12 @@ bot.command('homeworks', async ctx => {
 bot.hears('⌛ Домашние задания', async ctx => {
     await ctx.scene.enter('start');
 });
+// bot.hears('look20', async ctx => {
+//     await ctx.scene.enter('look');
+// });
+
+
+
 
 bot.hears('🌒 Работа со сном', async ctx => {
     ctx.reply(`Скоро откроем доступ. Просим набраться терпения` )
@@ -242,7 +257,7 @@ process.once('SIGTERM', () => dream.stop('SIGTERM'));
 //============================================================================
 
 // set port, listen for requests
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 8081;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}.`);
 });

@@ -10,11 +10,14 @@ const index16 = require("../temp/16")
 const index17 = require("../temp/17")
 const index18 = require("../temp/18")
 const DateConverter = require('../common/DateConverter');
+const {actionGetOneHomework, finishSent, homeworksList} = require("../homeworks");
+const {getWatch} = require("../lib/keyboards");
+const telegraf = require("telegraf");
 const convert = new DateConverter()
 
-class ScanHomeworkSceneGenerator {
-    GenScanScene () {
-        const scan = new BaseScene('scan')
+class lookHomeworkSceneGenerator {
+    GenLookScene () {
+        const look = new BaseScene('look')
         async function calcNowDay() {
             const date = new Date();
             const year = date.getFullYear();
@@ -22,8 +25,46 @@ class ScanHomeworkSceneGenerator {
             const day = date.getDate();
             return day + "-" + month + 1 + "-" + year
         }
-        scan.enter(async (ctx) => {
-            await ctx.reply(`Просмотр домашних заданий за последние 6 рассылок.\nСегодня ${ await calcNowDay()}\nВыберите, пожалуйста,  день для просмотра`,
+        look.enter(async (ctx) => {
+            const listOfLook =  await callDb.findAllIntensive2_0()
+            await ctx.reply(`Просмотр домашних заданий участников 2.0.\nСегодня ${ await calcNowDay()}\nВыберите, пожалуйста, участника`,
+                {
+                    reply_markup: {
+                        inline_keyboard: [
+                            [
+                                { text: `Выйти`, callback_data: 'close_look'}
+                            ]
+                        ]
+                    }
+                })
+            for (let i = 0; i < listOfLook.length; i++) {
+                // console.log(listOfLook[i].dataValues)
+                await ctx.reply(`${listOfLook[i].dataValues.real_name_telegram}`,
+                    {
+                        reply_markup: {
+                            inline_keyboard: [
+                                [
+                                    { text: `Выбрать`, callback_data: listOfLook[i].dataValues.chatId }
+                                ]
+                            ]
+                        }
+                    }
+
+                )
+            }
+
+        })
+        look.action('close_look', async ctx => {
+            const chatId = ctx.update.callback_query.from.id
+            const messageId = ctx.update.callback_query.message.message_id
+            ctx.answerCbQuery()
+            await ctx.telegram.deleteMessage(chatId, messageId)
+            await ctx.scene.leave()
+        });
+        look.action(/(\d+)/, async ctx => {
+            const newId = ctx.update.callback_query.data
+            console.log("The newId  id is:", newId)
+            await ctx.reply(`Просмотр домашних заданий за последние 6 рассылок для ${ newId }`,
                 {
                     reply_markup: {
                         inline_keyboard: [
@@ -55,25 +96,15 @@ class ScanHomeworkSceneGenerator {
                     }
                 }
 
-                )
-        })
-        scan.action('close_video', async ctx => {
+            )
+        });
+        look.action('close_step', async ctx => {
             const chatId = ctx.update.callback_query.from.id
             const messageId = ctx.update.callback_query.message.message_id
             ctx.answerCbQuery()
             await ctx.telegram.deleteMessage(chatId, messageId)
         });
-        scan.action('close_step', async ctx => {
-            const chatId = ctx.update.callback_query.from.id
-            const messageId = ctx.update.callback_query.message.message_id
-            ctx.answerCbQuery()
-            await ctx.telegram.deleteMessage(chatId, messageId)
-            await ctx.scene.leave()
-        });
-        scan.action('next_step', async ctx => {
-            ctx.answerCbQuery()
-            await ctx.reply('Эта функция пока в процессе разработки.')
-        });
+
         async function calculateLinkForSending(fullWeek, number) {
             const today = new Date();
             const dayOfWeek = today.getUTCDay();
@@ -88,8 +119,6 @@ class ScanHomeworkSceneGenerator {
             return arraySend[object - number]
         }
 
-
-
         async function calcLink(chatId, number) {
             // console.log(chatId)
             const user = await callDb.checkUserForCommon(chatId)
@@ -98,7 +127,7 @@ class ScanHomeworkSceneGenerator {
             if (fullWeek <= 56) {
                 const linkVideo = await calculateLinkForSending(fullWeek, number)
                 return linkVideo.link
-                }
+            }
             else {
                 const indexArrays = {
                     13: index13,
@@ -119,7 +148,7 @@ class ScanHomeworkSceneGenerator {
             }
         }
 
-        scan.action('check_today', async ctx => {
+        look.action('check_today', async ctx => {
             const chatId = ctx.update.callback_query.from.id
             const link = await calcLink(chatId, 0 )
             ctx.answerCbQuery()
@@ -135,87 +164,11 @@ class ScanHomeworkSceneGenerator {
                 })
         });
 
-        scan.action('check_minus_1', async ctx => {
-            const chatId = ctx.update.callback_query.from.id
-            const link = await calcLink(chatId, 1 )
-            ctx.answerCbQuery()
-            await ctx.reply(`Домашнее задание минус 1\n ${link}`,
-                {
-                    reply_markup: {
-                        inline_keyboard: [
-                            [
-                                { text: 'Закрыть', callback_data: 'close_video' }
-                            ]
-                        ]
-                    }
-                })
-        });
-        scan.action('check_minus_2', async ctx => {
-            const chatId = ctx.update.callback_query.from.id
-            const link = await calcLink(chatId, 2 )
-            ctx.answerCbQuery()
-            await ctx.reply(`Домашнее задание минус 2\n ${link}`,
-                {
-                    reply_markup: {
-                        inline_keyboard: [
-                            [
-                                { text: 'Закрыть', callback_data: 'close_video' }
-                            ]
-                        ]
-                    }
-                })
-        });
-        scan.action('check_minus_3', async ctx => {
-            const chatId = ctx.update.callback_query.from.id
-            const link = await calcLink(chatId, 3 )
-            ctx.answerCbQuery()
-            await ctx.reply(`Домашнее задание минус 3\n ${link}`,
-                {
-                    reply_markup: {
-                        inline_keyboard: [
-                            [
-                                { text: 'Закрыть', callback_data: 'close_video' }
-                            ]
-                        ]
-                    }
-                })
-        });
-        scan.action('check_minus_4', async ctx => {
-            const chatId = ctx.update.callback_query.from.id
-            const link = await calcLink(chatId, 4 )
-            ctx.answerCbQuery()
-            await ctx.reply(`Домашнее задание минус 4\n  ${link}`,
-                {
-                    reply_markup: {
-                        inline_keyboard: [
-                            [
-                                { text: 'Закрыть', callback_data: 'close_video' }
-                            ]
-                        ]
-                    }
-                })
-        });
-        scan.action('check_minus_5', async ctx => {
-            const chatId = ctx.update.callback_query.from.id
-            const link = await calcLink(chatId, 5 )
-            ctx.answerCbQuery()
-            await ctx.reply(`Домашнее задание минус 5\n ${link}`,
-                {
-                    reply_markup: {
-                        inline_keyboard: [
-                            [
-                                { text: 'Закрыть', callback_data: 'close_video' }
-                            ]
-                        ]
-                    }
-                })
-        });
-
-        scan.on('message', async (ctx) => {
+        look.on('message', async (ctx) => {
             await ctx.reply('Это я пока не понимаю.')
             await ctx.scene.reenter()
         })
-        return scan
+        return look
     }
 }
-module.exports = ScanHomeworkSceneGenerator
+module.exports = lookHomeworkSceneGenerator

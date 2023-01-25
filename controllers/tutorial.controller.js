@@ -93,6 +93,17 @@ exports.findAllIntensiveAll = async (req, res) => {
             return err;
         });
 };
+exports.findAllIntensive2_0 = async (req, res) => {
+    return await dataBot.Intensive.findAll({ where: { number: "number-2" }} )
+        .then(user => {
+            // console.log(user)
+            return user;
+        })
+        .catch(err => {
+            console.log(err)
+            return err;
+        });
+};
 
 
 // Retrieve all Tutorials from the database.
