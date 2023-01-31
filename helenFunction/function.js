@@ -7,6 +7,7 @@ const after57 = require("../temp/after57")
 const listAfter57 = require("../temp/homeworkafter57")
 const checkFile = require("../temp/24-01-2023-before-56")
 const alex = require("../temp/alex")
+const myasgo = require("../temp/myasgo")
 const homeworks_11_13 = require("../temp/11_13")
 const homeworks_14_19 = require("../temp/14_19")
 const helpHelen = require("../common/helpHelen");
@@ -17,9 +18,21 @@ const index16 = require("../temp/16")
 const index17 = require("../temp/17")
 const index18 = require("../temp/18")
 const DateConverter = require('../common/DateConverter');
+const sendFileBefore56 = require("../temp/31-01-2023-before56")
 const {actionGetOneHomework, finishSent, homeworksList} = require("../homeworks");
 const {getWatch} = require("../lib/keyboards");
 const convert = new DateConverter()
+
+
+//"0 6 * * 1-5" // каждый день недели, кроме субботы и воскресения, в 00:00
+// Cron.js состоит из шести полей:
+//
+//     минуты (0-59)
+// часы (0-23)
+// дни месяца (1-31)
+// месяцы (1-12)
+// дни недели (0-7, где 0 и 7 - воскресенье)
+// команда
 
 exports.startStep = async (ctx) => {
     await checkUserHelen(ctx.message.from).then(async (result) => {
@@ -109,7 +122,7 @@ async function nextStep(ctx) {
             await ctx.replyWithHTML(`<b>Команда message</b>`)
             break
         case "/convert":
-            await ctx.replyWithHTML(`<b>Команда convert</b>`)//Из общей в интесивe
+            await ctx.replyWithHTML(`<b>Команда convert</b>`)//Из общей в интесив
             await convertUserIntensive()
             break
         case "/sorting":
@@ -124,42 +137,26 @@ async function nextStep(ctx) {
             await ctx.replyWithHTML(`<b>Команда users57</b>`)
             await checkUsersForReal(ctx, after57)
             break
+        case "/access":
+            await ctx.replyWithHTML(`<b>Команда access</b>`)
+            await openAccessAll()
+            break
         case "/i20":
             await ctx.replyWithHTML(`<b>Команда i20</b>`)
-            await sendUsersIntensive2_0(ctx, checkFile)
-            // await sendUsersIntensive2_0(ctx, alex)
+            await sendUsersIntensive2_0(ctx, sendFileBefore56, await calcNowDate())
+            // await sendUsersIntensive2_0(ctx, alex, await calcNowDate())
             break
-        case "/i20_14":
-            await ctx.replyWithHTML(`<b>Команда i20_14</b>`)
-            await sendUsersIntensive2_0_14(ctx, after57, 10, "24 января 2023 года " )
-            await sendUsersIntensive2_0_14(ctx, alex, 10, "24 января 2023 года " )
+        case "/i57":
+            await ctx.replyWithHTML(`<b>Команда i57</b>`)
+            await sendUsersIntensive2_0_14(ctx, after57, 14, await calcNowDate())
+            // await sendUsersIntensive2_0_14(ctx, alex, 13, await calcNowDate())
+            // await sendUsersIntensive2_0_14(ctx, myasgo , 13, await calcNowDate())
             break
         default:
             await ctx.telegram.sendSticker(ctx.message.from.id, 'CAACAgIAAxkBAAEHUQtjx4Mrk8muB2BSyhVHqSko2ZZrQgACzBgAAntYUEmwTZrmztcawi0E')
             await ctx.replyWithHTML(`<b>Непонятная команда\n Повторите, пожалуйста, ввод. </b>`)
     }
 }
-async function  lookForSent(ctx){
-    await ctx.replyWithHTML(`<b>Выберите участника</b>`)
-    const listOfLook =  await callDb.findAllIntensive2_0()
-    // console.log(listOfLook)
-    for (let i = 0; i < listOfLook.length; i++) {
-        // console.log(listOfLook[i].dataValues)
-        await ctx.reply(`${listOfLook[i].dataValues.real_name_telegram}`,
-            {
-                reply_markup: {
-                    inline_keyboard: [
-                        [
-                            { text: `Выбрать`, callback_data: listOfLook[i].dataValues.chatId }
-                        ]
-                    ]
-                }
-            }
-
-        )
-}
-}
-
 
  mainCheckAdmin = async (ctx) => {
     const isAdmin = await checkUserAdmin(ctx.message.from);
@@ -187,6 +184,15 @@ async function checkUserAdmin(data) {
         throw err;
     }
 }
+async function calcNowDate(){
+    const allMonths = ["января", "февраля", "марта", "апреля" , "мая" , "июня" , "июля" , "августа" , "сентября" , "октября" , "ноября" , "декабря" ]
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth();
+    const day = today.getDate();
+    return day + " " + allMonths[month] + " " + year + " года"
+
+}
 
 async function transmitterOneToMore(ctx, array, message, userId) {
     // console.log("array.length -- ", array.length)
@@ -207,17 +213,43 @@ async function transmitterOneToMore(ctx, array, message, userId) {
 
 }
 
+async function openAccessAll(){
+    const oldArray = await callDb.findAll()
+    const newArray = oldArray.map(({
+                                       dataValues: {
+                                           chatId,
+                                       }
+                                   }) => {
+        return {
+            chatId: chatId,
+        }
+    });
+    for (let i = 0; i < newArray.length; i++) {
+       await callDb.inputTrue(newArray[i].chatId)
+    }
+}
+
 async function calculateAllIndexOfLink(fullWeek) {
     const today = new Date();
     const dayOfWeek = today.getUTCDay();
     // "id": "01-03",
     let indexLink = null
-    if (fullWeek <= 9) {
-        indexLink = "0" + fullWeek + "-0" + dayOfWeek
+    if (dayOfWeek <= 5) {
+        if (fullWeek <= 9) {
+            indexLink = "0" + fullWeek + "-0"+ dayOfWeek
+        } else {
+            indexLink = fullWeek + "-0" + dayOfWeek
+        }
     } else {
-        indexLink = fullWeek + "-0" + dayOfWeek
+        if (fullWeek <= 9) {
+            indexLink = "0" + fullWeek + "-01" //+ dayOfWeek
+        } else {
+            indexLink = fullWeek + "-01"  //+ dayOfWeek
+        }
     }
-    console.log(indexLink)
+
+
+    // console.log(indexLink)
     return indexLink
 }
 
@@ -325,7 +357,7 @@ async function checkUsersForReal(ctx, arraySend) {
     console.log(allErrors);
 }
 
-async function sendUsersIntensive2_0(ctx, newArrayIntensive) {
+async function sendUsersIntensive2_0(ctx, newArrayIntensive, date ) {
     for (let i = 0; i < newArrayIntensive.length; i++) {
         setTimeout(() => {
             try {
@@ -336,11 +368,11 @@ async function sendUsersIntensive2_0(ctx, newArrayIntensive) {
                     } else {
                         // console.log(newArrayIntensive[i])
                         try {
-                            await ctx.telegram.sendMessage(newArrayIntensive[i].chatId, `Доброго времени суток ${newArrayIntensive[i].name}\n\nДЗ от 24-01-2023 (${newArrayIntensive[i].indexWeek})\n` +
+                            await ctx.telegram.sendMessage(newArrayIntensive[i].chatId, `Доброго времени суток ${newArrayIntensive[i].name}\n\nДЗ от ${date} (${newArrayIntensive[i].indexWeek})\n` +
                                 `\n` +
                                 `${newArrayIntensive[i].link}\n`
                             )
-                            await callDb.saveSandingToDB(newArrayIntensive[i], newArrayIntensive[i].link)
+                            await callDb.saveSandingToDB(newArrayIntensive[i], newArrayIntensive[i].link, newArrayIntensive[i].indexVideo)
                             await ctx.replyWithHTML(`${newArrayIntensive[i].name} отправлено`)
                         } catch (error) {
                             if (error.response.error_code === 403) {
@@ -382,50 +414,50 @@ async function sendUsersIntensive2_0_14(ctx, newArrayIntensive, number, dayData 
                                  case 13 :
                                      await ctx.telegram.sendMessage(newArrayIntensive[i].chatId,
                                          `❤️ Доброго времени суток ${newArrayIntensive[i].name}\n\n` +
-                                         `ДЗ от ${ dayData }\n ` +
+                                         `ДЗ от ${ dayData }\n\n ` +
                                          `${index13[number].link}`
                                      )
-                                     await callDb.saveSandingToDB(newArrayIntensive[i], index13[number].link)
+                                     await callDb.saveSandingToDB(newArrayIntensive[i], index13[number].link, index13[number].index)
                                      break
                                  case 14 :
                                      await ctx.telegram.sendMessage(newArrayIntensive[i].chatId,
                                          `❤️ Доброго времени суток ${newArrayIntensive[i].name}\n\n` +
-                                         `ДЗ от ${ dayData }\n ` +
+                                         `ДЗ от ${ dayData }\n\n ` +
                                          `${index14[number].link}`
                                      )
-                                     await callDb.saveSandingToDB(newArrayIntensive[i], index14[number].link)
+                                     await callDb.saveSandingToDB(newArrayIntensive[i], index14[number].link, index14[number].index)
                                      break
                                  case 15 :
                                      await ctx.telegram.sendMessage(newArrayIntensive[i].chatId,
                                          `❤️ Доброго времени суток ${newArrayIntensive[i].name}\n\n` +
-                                         `ДЗ от ${ dayData }\n ` +
+                                         `ДЗ от ${ dayData }\n\n ` +
                                          `${index15[number].link}`
                                      )
-                                     await callDb.saveSandingToDB(newArrayIntensive[i], index15[number].link)
+                                     await callDb.saveSandingToDB(newArrayIntensive[i], index15[number].link, index15[number].index)
                                      break
                                  case 16 :
                                      await ctx.telegram.sendMessage(newArrayIntensive[i].chatId,
                                          `❤️ Доброго времени суток ${newArrayIntensive[i].name}\n\n` +
-                                         `ДЗ от ${ dayData }\n ` +
+                                         `ДЗ от ${ dayData }\n\n ` +
                                          `${index16[number].link}`
                                      )
-                                     await callDb.saveSandingToDB(newArrayIntensive[i], index16[number].link)
+                                     await callDb.saveSandingToDB(newArrayIntensive[i], index16[number].link, index16[number].index)
                                      break
                                  case 17 :
                                      await ctx.telegram.sendMessage(newArrayIntensive[i].chatId,
                                          `❤️ Доброго времени суток ${newArrayIntensive[i].name}\n\n` +
-                                         `ДЗ от ${ dayData }\n ` +
+                                         `ДЗ от ${ dayData }\n\n ` +
                                          `${index17[number].link}`
                                      )
-                                     await callDb.saveSandingToDB(newArrayIntensive[i], index17[number].link)
+                                     await callDb.saveSandingToDB(newArrayIntensive[i], index17[number].link, index17[number].index)
                                      break
                                  case 18 :
                                      await ctx.telegram.sendMessage(newArrayIntensive[i].chatId,
                                          `❤️ Доброго времени суток ${newArrayIntensive[i].name}\n\n` +
-                                         `ДЗ от ${ dayData }\n ` +
+                                         `ДЗ от ${ dayData }\n\n ` +
                                          `${index18[number].link}`
                                      )
-                                     await callDb.saveSandingToDB(newArrayIntensive[i], index18[number].link)
+                                     await callDb.saveSandingToDB(newArrayIntensive[i], index18[number].link, index18[number].index)
                                      break
                                  default:
                                      await ctx.replyWithHTML(`ошибка отправки ${newArrayIntensive[i].name} `)
@@ -576,13 +608,14 @@ async function findHelenForSend(arraySend) {
 
 async function createListOFSending(ctx, arraySend) {  //command is list
     const newData = await callDb.findAllIntensive()
-    const data = []
+    const dataBefore56 = []
+    const dataAfter56 = []
     for (let i = 0; i < newData.length; i++) {
         const fullMonth = await calculateMonthsSinceBirth(newData[i].dataValues.birthday_telegram)
         const fullWeek = await calculateWeeksSinceBirth(newData[i].dataValues.birthday_telegram)
         if (fullWeek <= 56) {
             const linkVideo = await calculateLinkForSending(fullWeek, arraySend)
-            data.push({
+            dataBefore56.push({
                 numberMonth: fullMonth,
                 numberWeek: fullWeek,
                 indexVideo: linkVideo.index,
@@ -592,10 +625,19 @@ async function createListOFSending(ctx, arraySend) {  //command is list
                 name: newData[i].dataValues.real_name_telegram,
                 birthday: newData[i].dataValues.birthday_telegram,
             })
+        }else {
+            dataAfter56.push({
+                numberMonth: fullMonth,
+                numberWeek: fullWeek,
+                chatId: newData[i].dataValues.chatId,
+                name: newData[i].dataValues.real_name_telegram,
+                birthday: newData[i].dataValues.birthday_telegram,
+            })
+
         }
     }
-    await ctx.replyWithHTML(` готово `)
-    console.log("newData ---", data)
+    console.log("dataBefore56 ---", dataBefore56)
+    console.log("dataAfter56 ---", dataAfter56)
 }
 
 async function createListOFSendingAfter56Week() {  //command is list57
@@ -615,7 +657,7 @@ async function createListOFSendingAfter56Week() {  //command is list57
             })
         }
     }
-    console.log("newData ---", dataAfter57)
+    console.log("dataAfter57 ---", dataAfter57)
 }
 
  checkUserHelen = (data) => {

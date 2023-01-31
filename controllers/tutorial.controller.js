@@ -191,6 +191,13 @@ exports.recordLink = async (chatId, videoId , linkID) => {
             })
     }
 }
+exports.inputTrue = async (id) => {
+    dataBot.Tutorial.update({ assess_homeworks: true }, {
+        where: { chatId: id }
+    })
+
+}
+
 exports.getOneUser = async (data) => {
     // console.log('findAndLogUser(data)  - ' + data)
     // console.log(data)
@@ -317,8 +324,8 @@ exports.getNumber = async () => {
 };
 
 exports.saveIndex57 = async (data) => {
-    await dataBot.IndexOfSend57.update({
-        indexSent: data
+    await dataBot.IndexOfSend57.update({ indexSent: data }, {
+        where: { id: 1 }
     })
         .catch(err => {
             console.log(err)
@@ -326,7 +333,7 @@ exports.saveIndex57 = async (data) => {
 
 }
 
-exports.saveSandingToDB =  async (user, link) => {
+exports.saveSandingToDB =  async (user, link, index) => {
     const newSending = {
         chatId: user.chatId,
         name:  user.name,
@@ -334,7 +341,7 @@ exports.saveSandingToDB =  async (user, link) => {
         numberMonth: user.numberMonth,
         numberWeek: user.numberWeek,
         link: link,
-        indexVideo: user.indexVideo,
+        indexVideo: index,
         indexWeek: user.numberWeek
     };
     await dataBot.Sending.create(newSending)

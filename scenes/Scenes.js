@@ -1,6 +1,7 @@
 const { Scenes: { BaseScene }, Markup} = require('telegraf');
 const callDb = require("../controllers/tutorial.controller")
 const diffTime = require("../common/differentMonths");
+const getCommon = require("../common/commonFunction");
 
 class SceneGenerator {
 GenBabyScene () {
@@ -442,6 +443,8 @@ GenBabyScene () {
             ctx.answerCbQuery()
             await ctx.telegram.deleteMessage(chatId, messageId)
             await ctx.scene.leave()
+            await getCommon.getServiceNew(ctx, chatId)
+            await getCommon.sendServiceNewUser(ctx, chatId)
         });
         return check
     }

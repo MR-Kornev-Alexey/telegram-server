@@ -20,7 +20,9 @@ class HomeworksGenerator {
         GenStartScene() {
         const start = new BaseScene('start')
         start.enter(async (ctx) => {
-           await callDb.getOneUser(ctx.message.from.id)
+            const user = ctx.scene.state.user;
+            console.log(user)
+           await callDb.getOneUser(user)
                 .then(async (result) => {
                     // console.log(result)
                     if(result.access_all){
@@ -43,13 +45,14 @@ class HomeworksGenerator {
             await actionHomeworkMenuMove(ctx)
         });
 
-        start.action('emo_menu', ctx => {
-            actionHomeworkMenuEmo(ctx).then(r => {
-            });
+        start.action('emo_menu', async ctx => {
+            await ctx.answerCbQuery()
+            await actionHomeworkMenuEmo(ctx)
         });
 
-        start.action('spk_menu', ctx => {
-            actionHomeworkMenuSpeak(ctx).then(r => {
+        start.action('spk_menu', async ctx => {
+            await ctx.answerCbQuery()
+            await actionHomeworkMenuSpeak(ctx).then(r => {
             });
         });
         start.action('close', async ctx => {

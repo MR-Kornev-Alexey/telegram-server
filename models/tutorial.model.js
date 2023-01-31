@@ -46,6 +46,10 @@ module.exports = (sequelize, Sequelize) => {
                 type: Sequelize.STRING,
                 defaultValue: 'data not entered'
         },
+        assess_homeworks: {
+            type: Sequelize.BOOLEAN,
+            defaultValue: false
+        },
         access_all: {
             type: Sequelize.BOOLEAN,
             defaultValue: false

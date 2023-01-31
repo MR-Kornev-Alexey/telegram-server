@@ -38,6 +38,11 @@ const checkScene = curScene.GenCheckScene()
 const homeScene = new HomeworksGenerator()
 const sendScene = new HomeSendGenerator()
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+const dreamStartSceneGenerator = require('./scenes/dreamStart')
+const dreamScene = new dreamStartSceneGenerator()
+const dreamStartScene = dreamScene.GenDreamStartScene()
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 const LookHomeworkSceneGenerator = require('./scenes/LookHomeworks')
 const lookSceneCommon = new LookHomeworkSceneGenerator()
 const lookScene = lookSceneCommon.GenLookScene()
@@ -54,9 +59,10 @@ const scanScene = scanHomeScene.GenScanScene()
 const callDb = require("./controllers/tutorial.controller")
 const diffTime = require("./common/differentMonths")
 const {sendHelp, sendHelpHelen} = require("./lib/help")
-const {getClose , getMainMenu, getMainMenuDream} = require('./lib/keyboards')
+const {getClose , getMainMenu, getMainMenuFirst, getService} = require('./lib/keyboards')
 const HelenFunction = require('./helenFunction/function')
 const dreamFunction = require('./dreamFunction/function')
+const getCommon = require('./common/commonFunction')
 
 function dataReducer(state = {data: []}, action) {
     switch (action.type) {
@@ -73,7 +79,7 @@ const store = createStore(dataReducer);
 const stage = new Scenes.Stage([ageScene,
     nameScene, babyScene, checkScene, emailScene,
     startScene, sendingHome, locationScene, babyEditScene,
-    ageEditScene, nameEditScene, emailEditScene, locationEditScene, scanScene, lookScene])
+    ageEditScene, nameEditScene, emailEditScene, locationEditScene, scanScene, lookScene, dreamStartScene])
 bot.use(session())
 bot.use(stage.middleware())
 dream.use(session())
@@ -107,15 +113,27 @@ async function checkUser(data) {
     });
 }
 
+const updateKeyboard = (newButtons) => {
+    return Markup.keyboard(newButtons).oneTime().resize()
+}
+const regButton = [
+    ['⌛ Домашние задания', '🌒 Работа со сном'],
+    ['✉️  Рассылка', '🪄 Сервисы'],
+    ['❔️ Помощь', '✏ Поддержка' ]
+]
+
+const newButtons = [
+    ['🪄 Сервисы', '👶 Ваши данные'],
+    ['❔️ Помощь', '✏ Поддержка' ]
+]
+
 bot.start(async (ctx) => {
     await checkUser(ctx.message.from).then(async (result) => {
         if (result) {
-            await ctx.replyWithHTML(
-                `<b>Добрый день ${ctx.message.from.first_name ? ctx.message.from.first_name : 'незнакомец'}!</b>\nВы можете проверить свои данные, нажав на "Проверить данные" в меню`, await getMainMenu()
-            )
+            await getCommon.getServiceNew(ctx, ctx.message.from.id)
         } else {
             await ctx.replyWithHTML(
-                `<b>Добрый день ${ctx.message.from.first_name ? ctx.message.from.first_name : 'незнакомец'}!</b>\nПройдите,пожалуйста регистрацию`,
+                `<b>Добрый день ${ctx.message.from.first_name ? ctx.message.from.first_name : 'незнакомец'}!</b>\nПриветстую Вас в Helen Bot.\n Для функциональной работы прошу Вас пройти регистрацию.`,
                 {
                     reply_markup: {
                         inline_keyboard: [
@@ -124,8 +142,8 @@ bot.start(async (ctx) => {
                             ]
                         ]
                     }
-                },
-                await getMainMenu())
+                }
+            )
         }
     }).catch(e => {
         console.log(e)
@@ -135,11 +153,43 @@ bot.start(async (ctx) => {
 bot.action('data_reg', async (ctx) => {
     await ctx.scene.enter('baby');
 });
+bot.action('close_service', async (ctx) => {
+    const chatId = ctx.update.callback_query.from.id
+    const messageId = ctx.update.callback_query.message.message_id
+    ctx.answerCbQuery()
+    await ctx.telegram.deleteMessage(chatId, messageId)
+});
+
+bot.action('homeworks_button', async (ctx) => {
+    const user =  ctx.update.callback_query.from.id
+    ctx.answerCbQuery()
+    console.log(user)
+    await ctx.scene.enter('start', { user });
+});
+bot.action('sending_button', async (ctx) => {
+    const user =  ctx.update.callback_query.from.id
+    ctx.answerCbQuery()
+    console.log(user)
+    await ctx.scene.enter('scan', { user });
+});
+bot.action('dream_button', async (ctx) => {
+    const user =  ctx.update.callback_query.from.id
+    ctx.answerCbQuery()
+    console.log(user)
+    await ctx.scene.enter('dream_start', { user });
+});
+
+
 bot.command('check', async (ctx) => {
     await ctx.scene.enter('check');
 });
+bot.command('service', async (ctx) => {
+     await getCommon.getServiceNew(ctx, ctx.message.from.id)
+});
 bot.command('homeworks', async ctx => {
-    await ctx.scene.enter('start');
+    const user =  ctx.message.from.id
+    await ctx.scene.enter('start', { user });
+    // await ctx.scene.enter('start');
 });
 bot.hears('⌛ Домашние задания', async ctx => {
     await ctx.scene.enter('start');
@@ -152,7 +202,8 @@ bot.hears('⌛ Домашние задания', async ctx => {
 
 
 bot.hears('🌒 Работа со сном', async ctx => {
-    ctx.reply(`Скоро откроем доступ. Просим набраться терпения` )
+    ctx.reply(`Доступ к методикам сна` )
+    // await ctx.scene.enter('dream_start');
 });
 bot.hears('✉️  Рассылка', async ctx => {
       await ctx.scene.enter('scan');
@@ -165,16 +216,15 @@ bot.command('support', async (ctx) => ctx.reply(`Вы можете написа�
 bot.hears('✏ Поддержка', async (ctx) => ctx.reply(`Вы можете написать в Службу поддержки Бота\n https://t.me/mrk_service`
 ))
 
-
 dream.start(async (ctx) => {
     await checkUser(ctx.message.from).then(async (result) => {
         if (result) {
             await ctx.replyWithHTML(
-                `<b>Добрый день ${ctx.message.from.first_name ? ctx.message.from.first_name : 'незнакомец'}!</b>\nВы можете проверить свои данные, нажав на "Проверить данные" в меню`,  await getMainMenuDream()
+                `<b>Добрый день ${ctx.message.from.first_name ? ctx.message.from.first_name : 'незнакомец'}!</b>\nВы можете проверить свои данные, нажав на "Проверить данные" в меню`, await getMainMenu()
             )
         } else {
             await ctx.replyWithHTML(
-                `<b>Добрый день ${ctx.message.from.first_name ? ctx.message.from.first_name : 'незнакомец'}!</b>\nПройдите,пожалуйста регистрацию`,
+                `<b>Добрый день ${ctx.message.from.first_name ? ctx.message.from.first_name : 'незнакомец'}!</b>\nПриветстую вас в Helen Bot.\n Для функциональной работы прошу Вас пройти регистрацию.`,
                 {
                     reply_markup: {
                         inline_keyboard: [
@@ -184,24 +234,58 @@ dream.start(async (ctx) => {
                         ]
                     }
                 },
-                await getMainMenuDream())
+                await getMainMenuFirst())
         }
     }).catch(e => {
         console.log(e)
     })
 
 })
+// dream.start(async (ctx) => {
+//     await checkUser(ctx.message.from.id).then(async (result) => {
+//         if (result) {
+//             await ctx.scene.enter('dream_start');
+//         } else {
+//             await ctx.replyWithHTML(
+//                 `<b>Добрый день ${ctx.message.from.first_name ? ctx.message.from.first_name : 'незнакомец'}!</b>\n Для доступа к методикам по сну пройдите,пожалуйста регистрацию`,
+//                 {
+//                     reply_markup: {
+//                         inline_keyboard: [
+//                             [
+//                                 { text: 'Регистрация', callback_data: 'data_reg' }
+//                             ]
+//                         ]
+//                     }
+//                 },
+//                 await getMainMenuDream()
+//             )
+//         }
+//     }).catch(e => {
+//         console.log(e)
+//     })
+//
+// })
 
 dream.action('data_reg', async (ctx) => {
     await ctx.scene.enter('baby');
 });
+// dream.action('/dream', async (ctx) => {
+//
+//     await ctx.scene.enter('dream_start');
+// });
+// dream.action('close_dream', async ctx => {
+//     const chatId = ctx.update.callback_query.from.id
+//     const messageId = ctx.update.callback_query.message.message_id
+//     ctx.answerCbQuery()
+//     await ctx.telegram.deleteMessage(chatId, messageId)
+// });
 dream.command('check', async (ctx) => {
     await ctx.scene.enter('check');
 });
 dream.command('support', async (ctx) => ctx.replyWithHTML(`Вы можете написать в Службу поддержки Бота\n https://t.me/mrk_service`
 ))
-dream.hears('✏ Поддержка', async (ctx) => ctx.replyWithHTML(`Вы можете написать в Службу поддержки Бота\n https://t.me/mrk_service`
-))
+dream.hears('✏ Поддержка', async (ctx) => ctx.replyWithHTML(`Вы можете написать в Службу поддержки Бота\n https://t.me/mrk_service`)
+)
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++
 helen.start(async (ctx) => {
@@ -233,6 +317,7 @@ app.get("/", (req, res) => {
 
 const db = require("./models");
 const helpHelen = require("./common/helpHelen");
+const {message} = require("telegraf/filters");
 
 db.sequelize.sync()
     .then(() => {

@@ -9,6 +9,13 @@ module.exports = [
     },
     {
         numberMonth: 13,
+        numberWeek: 57,
+        chatId: 5749279828,
+        name: 'Жулина Анастасия',
+        birthday: '21-12-2021'
+    },
+{
+        numberMonth: 13,
         numberWeek: 60,
         chatId: 1751611827,
         name: 'Соколовская Жанна',
@@ -73,6 +80,13 @@ module.exports = [
     },
     {
         numberMonth: 13,
+        numberWeek: 58,
+        chatId: 5210099858,
+        name: 'Ольга Некрасова',
+        birthday: '15-12-2021'
+    },
+    {
+        numberMonth: 13,
         numberWeek: 60,
         chatId: 1834962261,
         name: 'Юлия Бершак',
@@ -88,7 +102,7 @@ module.exports = [
         link: ''
     },
     {
-        numberMonth: 14,
+        numberMonth: 13,
         numberWeek: 63,
         chatId: 181725740,
         name: 'Екатерина Ковалева',
@@ -137,6 +151,13 @@ module.exports = [
     },
     {
         numberMonth: 16,
+        numberWeek: 70,
+        chatId: 973201262,
+        name: 'Ольга Мязго',
+        birthday: '28-09-2021'
+    },
+    {
+        numberMonth: 16,
         numberWeek: 71,
         chatId: 1718417481,
         name: 'Анастасия Медведева',
@@ -150,6 +171,13 @@ module.exports = [
         name: 'Светлана Савченкова',
         birthday: '20-08-2021',
         link: ''
+    },
+    {
+        numberMonth: 17,
+        numberWeek: 78,
+        chatId: 256452524,
+        name: 'Юлия Леонова',
+        birthday: '03-08-2021'
     },
     {
         numberMonth: 17,

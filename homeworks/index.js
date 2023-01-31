@@ -31,8 +31,6 @@ async function startHomeworkMenu(ctx) {
     )
 }
 
-
-
 async function returnHomeworkMenu (ctx) {
     const msg = ctx.update.callback_query.message
     let editedMessage = `ДОМАШНИЕ ЗАДАНИЯ\n выберите раздел`;
