@@ -41,6 +41,7 @@ const sendScene = new HomeSendGenerator()
 const dreamStartSceneGenerator = require('./scenes/dreamStart')
 const dreamScene = new dreamStartSceneGenerator()
 const dreamStartScene = dreamScene.GenDreamStartScene()
+const dreamBeginScene = dreamScene.GenDreamBeginScene()
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 const LookHomeworkSceneGenerator = require('./scenes/LookHomeworks')
@@ -79,7 +80,7 @@ const store = createStore(dataReducer);
 const stage = new Scenes.Stage([ageScene,
     nameScene, babyScene, checkScene, emailScene,
     startScene, sendingHome, locationScene, babyEditScene,
-    ageEditScene, nameEditScene, emailEditScene, locationEditScene, scanScene, lookScene, dreamStartScene])
+    ageEditScene, nameEditScene, emailEditScene, locationEditScene, scanScene, lookScene, dreamStartScene, dreamBeginScene])
 bot.use(session())
 bot.use(stage.middleware())
 dream.use(session())
@@ -176,7 +177,7 @@ bot.action('dream_button', async (ctx) => {
     const user =  ctx.update.callback_query.from.id
     ctx.answerCbQuery()
     console.log(user)
-    await ctx.scene.enter('dream_start', { user });
+    await ctx.scene.enter('dream_begin', { user });
 });
 
 

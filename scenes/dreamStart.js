@@ -4,6 +4,83 @@ const {getMainMenuDream} = require("../lib/keyboards");
 
 class dreamStartSceneGenerator {
 
+    GenDreamBeginScene() {
+        const dream_begin = new BaseScene('dream_begin')
+        const firstText =  'Вас приветствует чат-бот, готовый помочь в решении ваших проблем со сном ребенка. \n' +
+            'Внимательно ознакомьтесь с данной инструкцией.\n' +
+            '\n' +
+            'Внимание! Если что то не работает, выберите “Меню” (кнопка СИНЕГО цвета расположена в левом нижнем углу)  и нажмите на первую строку - “Перезапустить бота”\n' +
+            '\n' +
+            'Для работы: \n' +
+            'Нажмите кнопку “СТАРТ”\n' +
+            'Выберите одну из предложенных 4 методик для КРАТКОГО ознакомления.\n' +
+            'Если методика Вас заинтересовала,  нажмите кнопку “➡ Дальше” и, перейдя к подробному видео ознакомьтесь с методикой. Для работы по этой методике нажмите кнопку “ Этапы работы” и начните работать\n' +
+            '\n' +
+            'Если  вы понимаете что, эта методика Вам не подходит, вернитесь на шаг назад через кнопку ”Назад” и выберите другой вариант\n' +
+            '\n' +
+            'Внимание! Разделы по работе с дневными снами, ранними пробуждениями, пролонгацией дневных снов, ритуалами, ночными кормлениями и т.д. расположены в разделе “Этапы работы” ' +
+            'в каждой из методик.\n' +
+            '\n' +
+            'Перед началом работы походите по вкладкам меню, для лучшей ориентации.\n'
+        async function startMainDreamMenu(ctx) {
+
+            await ctx.reply( firstText ,
+                {
+                    reply_markup: {
+                        inline_keyboard: [
+                            [
+                                {text: 'СТАРТ', callback_data: 'start_data_dream'}
+                            ],
+                            [{text: "📕 Закрыть", callback_data: 'close_dream_begin'}]
+                        ]
+                    }
+                },
+                await getMainMenuDream()
+            )
+        }
+        dream_begin.enter(
+            async (ctx) => {
+                const user = ctx.scene.state.user;
+                await callDb.getOneUser(user)
+                    .then(async (result) => {
+                        console.log(result)
+                        if (result.access_dream) {
+                            await startMainDreamMenu(ctx)
+                        } else {
+                            await ctx.telegram.sendMessage(result.chatId, 'У вас нет доступа к курсу по сну.\n' +
+                                'Напишите в Службу поддержки\n https://t.me/mrk_service',
+                                {
+                                    reply_markup: {
+                                        inline_keyboard: [
+                                            [{text: "📕 Закрыть", callback_data: 'close_dream_begin'}]
+                                        ]
+                                    }
+                                }
+                            )
+                        }
+                    }).catch(e => {
+                            console.log(e)
+                        }
+                    )
+            })
+        dream_begin.action('close_dream_begin', async ctx => {
+            const chatId = ctx.update.callback_query.from.id
+            const messageId = ctx.update.callback_query.message.message_id
+            ctx.answerCbQuery()
+            await ctx.telegram.deleteMessage(chatId, messageId)
+            await ctx.scene.leave()
+        });
+        dream_begin.action('start_data_dream', async ctx => {
+            const chatId = ctx.update.callback_query.from.id
+            const messageId = ctx.update.callback_query.message.message_id
+            ctx.answerCbQuery()
+            await ctx.telegram.deleteMessage(chatId, messageId)
+            await ctx.scene.leave()
+            await ctx.scene.enter('dream_start')
+            // await ctx.scene.leave()
+        });
+        return dream_begin
+    }
     GenDreamStartScene() {
         const dream_start = new BaseScene('dream_start')
         const title = [
@@ -121,29 +198,10 @@ class dreamStartSceneGenerator {
 
         dream_start.enter(
             async (ctx) => {
-            const user = ctx.scene.state.user;
-            await callDb.getOneUser(user)
-                .then(async (result) => {
-                    console.log(result)
-                    if (result.access_dream) {
-                        await startMainDreamMenu(ctx)
-                    } else {
-                        await ctx.telegram.sendMessage(result.chatId, 'У вас нет доступа к курсу по сну.\n' +
-                            'Напишите в Службу поддержки\n https://t.me/mrk_service',
-                            {
-                                reply_markup: {
-                                    inline_keyboard: [
-                                        [{text: "📕 Закрыть", callback_data: 'close_dream'}]
-                                    ]
-                                }
-                            }
-                        )
-                    }
-                }).catch(e => {
-                        console.log(e)
-                    }
+                await ctx.reply(
+                    `♥️ Выберите, пожалуйста, методику ♥️\n`,
+                    await keyMain()
                 )
-
         })
 
         async function keyMain() {
