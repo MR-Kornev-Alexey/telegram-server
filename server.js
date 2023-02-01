@@ -206,12 +206,6 @@ bot.command('homeworks', async ctx => {
 bot.hears('⌛ Домашние задания', async ctx => {
     await ctx.scene.enter('start');
 });
-// bot.hears('look20', async ctx => {
-//     await ctx.scene.enter('look');
-// });
-
-
-
 
 bot.hears('🌒 Работа со сном', async ctx => {
     ctx.reply(`Доступ к методикам сна` )
