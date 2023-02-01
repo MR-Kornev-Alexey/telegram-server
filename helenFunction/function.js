@@ -18,7 +18,7 @@ const index16 = require("../temp/16")
 const index17 = require("../temp/17")
 const index18 = require("../temp/18")
 const DateConverter = require('../common/DateConverter');
-const sendFileBefore56 = require("../temp/31-01-2023-before56")
+const sendFileBefore56 = require("../temp/01-02-2023-before56")
 const {actionGetOneHomework, finishSent, homeworksList} = require("../homeworks");
 const {getWatch} = require("../lib/keyboards");
 const convert = new DateConverter()
@@ -148,7 +148,7 @@ async function nextStep(ctx) {
             break
         case "/i57":
             await ctx.replyWithHTML(`<b>Команда i57</b>`)
-            await sendUsersIntensive2_0_14(ctx, after57, 15, await calcNowDate())
+            await sendUsersIntensive2_0_14(ctx, after57, 16, await calcNowDate())
             // await sendUsersIntensive2_0_14(ctx, alex, 13, await calcNowDate())
             // await sendUsersIntensive2_0_14(ctx, myasgo , 13, await calcNowDate())
             break

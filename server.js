@@ -113,6 +113,17 @@ async function checkUser(data) {
             });
     });
 }
+//const cron = require('node-cron');
+//
+// cron.schedule('0 8 * * 1,5', () => {
+//   console.log('Running task every Monday and Friday at 8 AM Moscow time');
+// });
+
+const cron = require('node-cron');
+
+cron.schedule('*/10 * * * *', () => {
+    console.log('Running task every 10 minutes');
+});
 
 const updateKeyboard = (newButtons) => {
     return Markup.keyboard(newButtons).oneTime().resize()
@@ -343,7 +354,7 @@ process.once('SIGTERM', () => dream.stop('SIGTERM'));
 //============================================================================
 
 // set port, listen for requests
-const PORT = process.env.PORT || 8081;
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}.`);
 });

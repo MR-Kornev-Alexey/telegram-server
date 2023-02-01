@@ -355,39 +355,44 @@ GenBabyScene () {
         const check = new BaseScene('check')
         check.enter(async (ctx) => {
             callDb.getOne(ctx.message.from).then(async (result) => {
-                ctx.replyWithMarkdown(
-                    `Проверьте Ваши данные:\n` +
-                    `*Имя ребенка* - ${result.baby_name_telegram}\n`+
-                    `*Дата рождения ребенка* - ${result.birthday_telegram}\n` +
-                    `*Число полных месяцев* - ${diffTime.calculating(result.birthday_telegram)}\n` +
-                    `*Ваши Имя и Фамилия* - ${result.real_name_telegram}\n` +
-                    `Вы живете в  ${result.location}\n` +
-                    `*Ваш email* - ${result.email_telegram}`,
-                    {
-                        reply_markup: {
-                            inline_keyboard: [
-                                [
-                                    { text: 'Изменить имя ребенка', callback_data: 'edit_baby' }
-                                ],
-                                [
-                                    { text: 'Изменить дату рождения ребенка', callback_data: 'edit_birthday' }
-                                ],
-                                [
-                                    { text: 'Изменить имя', callback_data: 'edit_name' }
-                                ],
-                                [
-                                    { text: 'Изменить локацию', callback_data: 'edit_location' }
-                                ],
-                                [
-                                    { text: 'Изменить email', callback_data: 'edit_email' }
-                                ],
-                                [
-                                    { text: 'Все верно', callback_data: 'yes' }
+                try{
+                    await ctx.reply(
+                        `Проверьте Ваши данные:\n` +
+                        `*Имя ребенка* - ${result.baby_name_telegram}\n` +
+                        `*Дата рождения ребенка* - ${result.birthday_telegram}\n` +
+                        `*Число полных месяцев* - ${diffTime.calculating(result.birthday_telegram)}\n` +
+                        `*Ваши Имя и Фамилия* - ${result.real_name_telegram}\n` +
+                        `Вы живете в  ${result.location}\n` +
+                        `*Ваш email* - ${result.email_telegram}`,
+                        {
+                            reply_markup: {
+                                inline_keyboard: [
+                                    [
+                                        {text: 'Изменить имя ребенка', callback_data: 'edit_baby'}
+                                    ],
+                                    [
+                                        {text: 'Изменить дату рождения ребенка', callback_data: 'edit_birthday'}
+                                    ],
+                                    [
+                                        {text: 'Изменить имя', callback_data: 'edit_name'}
+                                    ],
+                                    [
+                                        {text: 'Изменить локацию', callback_data: 'edit_location'}
+                                    ],
+                                    [
+                                        {text: 'Изменить email', callback_data: 'edit_email'}
+                                    ],
+                                    [
+                                        {text: 'Все верно', callback_data: 'yes'}
+                                    ]
                                 ]
-                            ]
+                            }
                         }
-                    }
-                )
+                    )
+
+                } catch (e) {
+                    console.log(e)
+                }
         })
         }
         )
