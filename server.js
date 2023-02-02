@@ -122,22 +122,17 @@ async function checkUser(data) {
 const cron = require('node-cron');
 
 cron.schedule('*/10 * * * *', () => {
+    helen.telegram.sendMessage(1081994928, `Тестовая рассылка каждые 10 минут `).then(r => {})
     console.log('Running task every 10 minutes');
+});
+cron.schedule('0 6 * * 1-5', () => {
+    helen.telegram.sendMessage(1081994928, `Running task every Monday -  Friday at 6 AM Moscow time`).then(r => {})
+  console.log('Running task every Monday -  Friday at 8 AM Moscow time');
 });
 
 const updateKeyboard = (newButtons) => {
     return Markup.keyboard(newButtons).oneTime().resize()
 }
-const regButton = [
-    ['⌛ Домашние задания', '🌒 Работа со сном'],
-    ['✉️  Рассылка', '🪄 Сервисы'],
-    ['❔️ Помощь', '✏ Поддержка' ]
-]
-
-const newButtons = [
-    ['🪄 Сервисы', '👶 Ваши данные'],
-    ['❔️ Помощь', '✏ Поддержка' ]
-]
 
 bot.start(async (ctx) => {
     await checkUser(ctx.message.from).then(async (result) => {
@@ -247,44 +242,11 @@ dream.start(async (ctx) => {
     })
 
 })
-// dream.start(async (ctx) => {
-//     await checkUser(ctx.message.from.id).then(async (result) => {
-//         if (result) {
-//             await ctx.scene.enter('dream_start');
-//         } else {
-//             await ctx.replyWithHTML(
-//                 `<b>Добрый день ${ctx.message.from.first_name ? ctx.message.from.first_name : 'незнакомец'}!</b>\n Для доступа к методикам по сну пройдите,пожалуйста регистрацию`,
-//                 {
-//                     reply_markup: {
-//                         inline_keyboard: [
-//                             [
-//                                 { text: 'Регистрация', callback_data: 'data_reg' }
-//                             ]
-//                         ]
-//                     }
-//                 },
-//                 await getMainMenuDream()
-//             )
-//         }
-//     }).catch(e => {
-//         console.log(e)
-//     })
-//
-// })
 
 dream.action('data_reg', async (ctx) => {
     await ctx.scene.enter('baby');
 });
-// dream.action('/dream', async (ctx) => {
-//
-//     await ctx.scene.enter('dream_start');
-// });
-// dream.action('close_dream', async ctx => {
-//     const chatId = ctx.update.callback_query.from.id
-//     const messageId = ctx.update.callback_query.message.message_id
-//     ctx.answerCbQuery()
-//     await ctx.telegram.deleteMessage(chatId, messageId)
-// });
+
 dream.command('check', async (ctx) => {
     await ctx.scene.enter('check');
 });
@@ -348,7 +310,7 @@ process.once('SIGTERM', () => dream.stop('SIGTERM'));
 //============================================================================
 
 // set port, listen for requests
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 8081;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}.`);
 });

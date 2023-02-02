@@ -18,7 +18,7 @@ const index16 = require("../temp/16")
 const index17 = require("../temp/17")
 const index18 = require("../temp/18")
 const DateConverter = require('../common/DateConverter');
-const sendFileBefore56 = require("../temp/01-02-2023-before56")
+const sendFileBefore56 = require("../temp/02-02-2023-before56")
 const {actionGetOneHomework, finishSent, homeworksList} = require("../homeworks");
 const {getWatch} = require("../lib/keyboards");
 const convert = new DateConverter()
@@ -148,7 +148,7 @@ async function nextStep(ctx) {
             break
         case "/i57":
             await ctx.replyWithHTML(`<b>Команда i57</b>`)
-            await sendUsersIntensive2_0_14(ctx, after57, 16, await calcNowDate())
+            await sendUsersIntensive2_0_14(ctx, after57, 17, await calcNowDate())
             // await sendUsersIntensive2_0_14(ctx, alex, 13, await calcNowDate())
             // await sendUsersIntensive2_0_14(ctx, myasgo , 13, await calcNowDate())
             break
@@ -236,9 +236,9 @@ async function calculateAllIndexOfLink(fullWeek) {
     let indexLink = null
     if (dayOfWeek <= 5) {
         if (fullWeek <= 9) {
-            indexLink = "0" + fullWeek + "-0"+ dayOfWeek
+            indexLink = "0" + fullWeek + "-05"//+ dayOfWeek
         } else {
-            indexLink = fullWeek + "-0" + dayOfWeek
+            indexLink = fullWeek + "-05" //+ dayOfWeek
         }
     } else {
         if (fullWeek <= 9) {
@@ -559,7 +559,8 @@ async function convertUserIntensive() {
                                            chatId,
                                            baby_name_telegram,
                                            birthday_telegram,
-                                           email_telegram
+                                           email_telegram,
+                                           assess_homeworks
                                        }
                                    }) => {
         return {
@@ -569,15 +570,18 @@ async function convertUserIntensive() {
             birthdayBaby: birthday_telegram,
             email: email_telegram,
             first_name_telegram: first_name_telegram,
+            assess:	assess_homeworks
         }
     });
     for (let i = 0; i < newArray.length; i++) {
         const user = await callDb.checkUserForIntensive(newArray[i].chatId)
         if (user) {
-            // console.log("найден ---", newArray[i].chatId ,"----", newArray[i].chatId)
+            console.log("найден ---", newArray[i].name ,"----", newArray[i].chatId)
         } else {
-            console.log("не найден ---", newArray[i].chatId, "----", newArray[i].chatId)
-            await callDb.createUserForIntensive(newArray[i])
+            console.log("не найден ---", newArray[i].name, "----", newArray[i].chatId)
+            if(newArray[i].assess){
+                await callDb.createUserForIntensive(newArray[i])
+            }
         }
     }
     // console.log(newArray)

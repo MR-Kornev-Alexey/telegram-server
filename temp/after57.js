@@ -126,6 +126,13 @@ module.exports = [
         link: ''
     },
     {
+        numberMonth: 14,
+        numberWeek: 57,
+        chatId: 73161856,
+        name: 'Анастасия Жмыхова',
+        birthday: '29-12-2021'
+    },
+    {
         numberMonth: 15,
         numberWeek: 68,
         chatId: 778122753,
