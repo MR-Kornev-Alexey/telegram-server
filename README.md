@@ -26,6 +26,20 @@ help  - Подсказать
 
 
 nYEw-3Xv3mAq
+// Массив, хранящий статусы нажатия кнопок
+const buttonStatus = [];
+
+bot.on('callback_query', (ctx) => {
+const { callbackQuery } = ctx;
+const { data } = callbackQuery;
+
+// Если статус кнопки равен false, то нажатие еще не производилось
+if (!buttonStatus[data]) {
+buttonStatus[data] = true;
+// Выполняем действия, связанные с нажатием кнопки
+// ...
+}
+});
 
 Дорогие участники и участницы! 
 Сегодня 17 01 23  Вам было 2 раза отправлены домашние задания. 

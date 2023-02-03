@@ -121,13 +121,13 @@ async function checkUser(data) {
 
 const cron = require('node-cron');
 
-cron.schedule('*/10 * * * *', () => {
-    helen.telegram.sendMessage(1081994928, `Тестовая рассылка каждые 10 минут `).then(r => {})
-    console.log('Running task every 10 minutes');
-});
+// cron.schedule('*/10 * * * *', () => {
+//     helen.telegram.sendMessage(1081994928, `Тестовая рассылка каждые 10 минут `).then(r => {})
+//     console.log('Running task every 10 minutes');
+// });
 cron.schedule('0 6 * * 1-5', () => {
     helen.telegram.sendMessage(1081994928, `Running task every Monday -  Friday at 6 AM Moscow time`).then(r => {})
-  console.log('Running task every Monday -  Friday at 8 AM Moscow time');
+  console.log('Running task every Monday -  Friday at 6 AM Moscow time');
 });
 
 const updateKeyboard = (newButtons) => {
