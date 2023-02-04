@@ -18,7 +18,7 @@ const index16 = require("../temp/16")
 const index17 = require("../temp/17")
 const index18 = require("../temp/18")
 const DateConverter = require('../common/DateConverter');
-const sendFileBefore56 = require("../temp/02-02-2023-before56")
+const sendFileBefore56 = require("../temp/03-02-2023-before56")
 const {actionGetOneHomework, finishSent, homeworksList} = require("../homeworks");
 const {getWatch} = require("../lib/keyboards");
 const convert = new DateConverter()
@@ -33,6 +33,17 @@ const convert = new DateConverter()
 // месяцы (1-12)
 // дни недели (0-7, где 0 и 7 - воскресенье)
 // команда
+
+exports.openDreamNewUser = async (ctx, user) => {
+    await callDb.saveDreamNew(user).then(
+        await ctx.reply(
+            `Доступ открыт`
+        )
+    ).catch(e => {
+        console.log(e)
+        }
+    )
+}
 
 exports.startStep = async (ctx) => {
     await checkUserHelen(ctx.message.from).then(async (result) => {
@@ -148,7 +159,7 @@ async function nextStep(ctx) {
             break
         case "/i57":
             await ctx.replyWithHTML(`<b>Команда i57</b>`)
-            await sendUsersIntensive2_0_14(ctx, after57, 17, await calcNowDate())
+            await sendUsersIntensive2_0_14(ctx, after57, 18, await calcNowDate())
             // await sendUsersIntensive2_0_14(ctx, alex, 13, await calcNowDate())
             // await sendUsersIntensive2_0_14(ctx, myasgo , 13, await calcNowDate())
             break

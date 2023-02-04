@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const {Telegraf, Markup, Scenes, session} = require('telegraf')
+const cron = require('node-cron');
 // const environment = process.env.NODE_ENV || 'development';
 // const config = require(`./token/config.${environment}.json`);
 // const bot = new Telegraf(config.token);
@@ -113,26 +114,14 @@ async function checkUser(data) {
             });
     });
 }
-//const cron = require('node-cron');
-//
-// cron.schedule('0 8 * * 1,5', () => {
-//   console.log('Running task every Monday and Friday at 8 AM Moscow time');
-// });
 
-const cron = require('node-cron');
 
-// cron.schedule('*/10 * * * *', () => {
-//     helen.telegram.sendMessage(1081994928, `Тестовая рассылка каждые 10 минут `).then(r => {})
-//     console.log('Running task every 10 minutes');
-// });
+
+
 cron.schedule('0 6 * * 1-5', () => {
     helen.telegram.sendMessage(1081994928, `Running task every Monday -  Friday at 6 AM Moscow time`).then(r => {})
   console.log('Running task every Monday -  Friday at 6 AM Moscow time');
 });
-
-const updateKeyboard = (newButtons) => {
-    return Markup.keyboard(newButtons).oneTime().resize()
-}
 
 bot.start(async (ctx) => {
     await checkUser(ctx.message.from).then(async (result) => {
@@ -185,6 +174,17 @@ bot.action('dream_button', async (ctx) => {
     console.log(user)
     await ctx.scene.enter('dream_begin', { user });
 });
+bot.action('open_dream_new_user', async (ctx) => {
+    const text =  ctx.update.callback_query.message.text
+    ctx.answerCbQuery()
+    // console.log(text)
+    const startIndex = text.indexOf("id-") + 3;
+    const endIndex = text.indexOf("-id");
+    const id = text.substring(startIndex, endIndex);
+    // console.log(id);
+    await HelenFunction.openDreamNewUser(ctx, id)
+});
+
 
 
 bot.command('check', async (ctx) => {

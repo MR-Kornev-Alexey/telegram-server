@@ -124,11 +124,11 @@ module.exports = [
             "\n" +
             "И помните, самое сложное — это НАЧАТЬ действовать. \n" +
             "Все остальное — вопрос НАСТОЙЧИВОСТИ.\n",
-    },//31.01.2023 17 index
+    },//02.02.2023 17 index
     {
      "index": "emo-11-13-5",
      "link": "https://youtu.be/v1Loxijj9Yg"
-    },
+    },//18
     {
      "index": "move-11-13-6",
      "link": "https://youtu.be/nkP4F4ULGVk"

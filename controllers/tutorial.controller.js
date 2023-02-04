@@ -191,6 +191,12 @@ exports.recordLink = async (chatId, videoId , linkID) => {
             })
     }
 }
+
+exports.saveDreamNew = async (id) => {
+    dataBot.Tutorial.update({ access_all: true, access_dream: true }, {
+        where: { chatId: id }
+    })
+}
 exports.inputTrue = async (id) => {
     dataBot.Tutorial.update({ assess_homeworks: true }, {
         where: { chatId: id }

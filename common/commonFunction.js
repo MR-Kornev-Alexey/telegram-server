@@ -50,5 +50,17 @@ exports.getServiceNew = async (ctx, dataUser) => {
 exports.sendServiceNewUser = async (ctx, dataUser) => {
     const user = await callDb.getOneUser(dataUser)
     console.log(user)
-    await ctx.telegram.sendMessage( 1081994928, `Новая регистрация или изменение данных\n Пользователь ${user.real_name_telegram}`)
+    await ctx.telegram.sendMessage( 1081994928, `Новая регистрация или изменение данных\n Пользователь ${user.real_name_telegram}\nid-${user.chatId}-id`,
+        {
+            reply_markup: {
+                inline_keyboard: [
+                    [
+                        {
+                            "text": "Открыть доступ",
+                            "callback_data": "open_dream_new_user"
+                        }
+                    ]
+                ]
+            }
+        })
 }
