@@ -59,12 +59,11 @@ const scanScene = scanHomeScene.GenScanScene()
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 const callDb = require("./controllers/tutorial.controller")
-const diffTime = require("./common/differentMonths")
-const {sendHelp, sendHelpHelen} = require("./lib/help")
+const {sendHelp} = require("./lib/help")
 const {getClose , getMainMenu, getMainMenuFirst, getService} = require('./lib/keyboards')
 const HelenFunction = require('./helenFunction/function')
-const dreamFunction = require('./dreamFunction/function')
 const getCommon = require('./common/commonFunction')
+
 
 function dataReducer(state = {data: []}, action) {
     switch (action.type) {
@@ -74,8 +73,6 @@ function dataReducer(state = {data: []}, action) {
             return state;
     }
 }
-
-const app = express();
 const store = createStore(dataReducer);
 
 const stage = new Scenes.Stage([ageScene,
@@ -89,11 +86,7 @@ dream.use(stage.middleware())
 helen.use(session())
 helen.use(stage.middleware())
 
-const corsOptions = {
-    origin: "http://localhost:8081"
-};
 
-app.use(cors(corsOptions));
 
 async function checkUser(data) {
     return new Promise((resolve, reject) => {
@@ -262,28 +255,53 @@ helen.on('message', async (ctx) => {
     await HelenFunction.firstStep(ctx)
 })
 //+++++++++++++++++++++++++++++++++++++++++++++++++++
-// parse requests of content-type - application/json
+
+
+const app = express();
+const loginRouter = require('./admin/loginRouter');
+
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// parse requests of content-type - application/x-www-form-urlencoded
-app.use(express.urlencoded({extended: true}));
+const path = require('path');
+const publicAll = path.join(__dirname, './public');
+const publicRouter = express.Router();
+const adminRouter = express.Router();
 
-// simple route
-app.get("/", (req, res) => {
-    res.json({message: "Welcome! Alexey! Node"});
+publicRouter.get('/', function(req, res) {
+    res.sendFile(path.join(publicAll, 'index.html'));
 });
-// const path = require('path');
-// const public = path.join(__dirname, 'public');
-// app.get('/', function(req, res) {
-//     res.sendFile(path.join(public, 'index.html'));
-// });
-//
-// app.use('/', express.static(public));
+
+adminRouter.use((req, res, next) => {
+    if (!req.user) {
+        return res.status(401).send('You need to be authenticated to access this page Brother');
+    }
+    next();
+});
+adminRouter.get('/', (req, res) => {
+    res.send('Welcome to the admin page');
+});
+
+
+app.use(cors({
+    origin: "http://localhost:8080"
+}));
+app.use(express.static(publicAll));
+app.use('/public', publicRouter);
+app.use('/admin', adminRouter);
+
+app.use((err, req, res, next) => {
+    console.error(err)
+    const error = process.env.NODE_ENV === 'production' ? 'Sorry, an error has occurred!' : err
+    res.status(500).send({ error })
+});
+
+
+
+// app.use(loginRouter.loginRouter);
 
 
 const db = require("./models");
-const helpHelen = require("./common/helpHelen");
-const {message} = require("telegraf/filters");
 
 db.sequelize.sync()
     .then(() => {
@@ -308,7 +326,7 @@ process.once('SIGTERM', () => dream.stop('SIGTERM'));
 //============================================================================
 
 // set port, listen for requests
-const PORT = process.env.PORT || 8081;
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}.`);
 });

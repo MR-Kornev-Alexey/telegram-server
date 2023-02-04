@@ -356,6 +356,7 @@ class dreamStartSceneGenerator {
                                 [{text: "Раннее пробуждение", callback_data: 'early_awakening_' + number}],
                                 [{text: "Важные условия для сна", callback_data: 'important_conditions_' + number}],
                                 [{text: "Ночные кормления", callback_data: 'night_feedings_' + number}],
+                                [{text: "Особенность работы с близнецами, погодками ...", callback_data: 'twins_' + number}],
                                 [{text: "Вопросы - ответы", callback_data: 'questions_answers_' + number}],
                                 [{text: "Гайд для печати", callback_data: 'guide_print_' + number}],
                                 [{text: "⬅️ Назад", callback_data: `back_frame_${number}`}],
@@ -584,6 +585,10 @@ class dreamStartSceneGenerator {
                 }
                 if (firstFour === 'day_') {
                     const editedMessageSix = `${title[index]}\nДневной сон\n https://youtu.be/${dayDreams[index]}\n`;
+                    await nextSixScreenOne(ctx, editedMessageSix, index + 1);
+                }
+                if (firstFour === 'twin') {
+                    const editedMessageSix = `Особенность работы с близнецами, двойняшками,тройняшками  погодками\n http://elenakorneva.site/pdf/twins.pdf`;
                     await nextSixScreenOne(ctx, editedMessageSix, index + 1);
                 }
                 if (firstFour === 'guid') {
