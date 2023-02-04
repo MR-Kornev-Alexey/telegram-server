@@ -177,11 +177,9 @@ bot.action('dream_button', async (ctx) => {
 bot.action('open_dream_new_user', async (ctx) => {
     const text =  ctx.update.callback_query.message.text
     ctx.answerCbQuery()
-    // console.log(text)
     const startIndex = text.indexOf("id-") + 3;
     const endIndex = text.indexOf("-id");
     const id = text.substring(startIndex, endIndex);
-    // console.log(id);
     await HelenFunction.openDreamNewUser(ctx, id)
 });
 
