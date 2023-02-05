@@ -80,6 +80,7 @@ cron.schedule('*/10 * * * *', () => {
 });
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+
 function dataReducer(state = {data: []}, action) {
     switch (action.type) {
         case 'ADD_DATA':
