@@ -23,7 +23,7 @@ module.exports = [
         link: ''
     },
     {
-        numberMonth: 13,
+        numberMonth: 14,
         numberWeek: 59,
         chatId: 1430019107,
         name: 'Регина Хайруллина',

@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const {Telegraf, Markup, Scenes, session} = require('telegraf')
 const cron = require('node-cron');
+const HelenFunction = require('./helenFunction/function')
 // const environment = process.env.NODE_ENV || 'development';
 // const config = require(`./token/config.${environment}.json`);
 // const bot = new Telegraf(config.token);
@@ -10,15 +11,19 @@ const cron = require('node-cron');
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 const token_dream = "5858592661:AAGdzbUERIMeXsAANjKkONyCZDk56TDnON0"// dream bot
 const token_dev = "5739415913:AAG0e8F6BtVEFHusoIRix8wvkKN23RZpcsc" // main bot
+// const token_super = "5810660881:AAEtp2JduLoeBpiHBXDCfJKKbSWw3fiArVU" // superHelen bot
 const bot = new Telegraf(token_dev);
 const dream = new Telegraf(token_dream);
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 const token_helen = "5815175979:AAGXqlzqxeq9LCigysbmxrqmhVrsD76LGos" //helen_bot
 // const token_helen = "5739415913:AAG0e8F6BtVEFHusoIRix8wvkKN23RZpcsc" //main_bot
+const helenFunction = require('./helenFunction/function');
+const getCommon = require('./common/commonFunction')
+const sendUsersNew = require('./common/SentUser');
 const helen = new Telegraf(token_helen);
+
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 const {createStore} = require('redux');
-
 const HomeworksGenerator = require('./scenes/Homeworks')
 const HomeSendGenerator = require('./scenes/Send')
 
@@ -55,15 +60,22 @@ const sendingHome = sendScene.GenHomeScene()
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 const startScene = homeScene.GenStartScene()
 const scanScene = scanHomeScene.GenScanScene()
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 const callDb = require("./controllers/tutorial.controller")
 const {sendHelp} = require("./lib/help")
 const {getClose , getMainMenu, getMainMenuFirst, getService} = require('./lib/keyboards')
-const HelenFunction = require('./helenFunction/function')
-const getCommon = require('./common/commonFunction')
 
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+cron.schedule('0 6 * * 1-5', async () => {
+    await sendUsersNew(helen)
+});
+
+cron.schedule('0 5 * * 1-5', () => {
+    helen.telegram.sendMessage(1081994928, `Running task every Monday -  Friday at 6 AM Moscow time`).then(r => {})
+
+    console.log('Running task every Monday -  Friday at 6 AM Moscow time');
+});
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 function dataReducer(state = {data: []}, action) {
     switch (action.type) {
@@ -110,11 +122,6 @@ async function checkUser(data) {
 
 
 
-
-cron.schedule('0 6 * * 1-5', () => {
-    helen.telegram.sendMessage(1081994928, `Running task every Monday -  Friday at 6 AM Moscow time`).then(r => {})
-  console.log('Running task every Monday -  Friday at 6 AM Moscow time');
-});
 
 bot.start(async (ctx) => {
     await checkUser(ctx.message.from).then(async (result) => {
@@ -302,6 +309,7 @@ app.use((err, req, res, next) => {
 
 
 const db = require("./models");
+const arraySend = require("./lib/send_0_56");
 
 db.sequelize.sync()
     .then(() => {

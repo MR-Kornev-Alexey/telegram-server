@@ -121,9 +121,9 @@ async function nextStep(ctx) {
             await ctx.replyWithHTML(`<b>Команда list</b>`) //создание листа для рассылки
             await createListOFSending(ctx, arraySend)
             break
-        case "/sent20":
-            await ctx.replyWithHTML(`<b>Команда sent20</b>`) //создание листа для рассылки
-            await createListOFSending(ctx, arraySend)
+        case "/test20":
+            await ctx.replyWithHTML(`<b>Команда test20</b>`) //создание тестового листа для рассылки
+            await createListOFSending (ctx, arraySend)
             break
         case "/list57":
             await ctx.replyWithHTML(`<b>Команда list57</b>`) //создание листа для рассылки
@@ -155,6 +155,11 @@ async function nextStep(ctx) {
         case "/i20":
             await ctx.replyWithHTML(`<b>Команда i20</b>`)
             await sendUsersIntensive2_0(ctx, sendFileBefore56, await calcNowDate())
+            // await sendUsersIntensive2_0(ctx, alex, await calcNowDate())
+            break
+        case "/i01":
+            await ctx.replyWithHTML(`<b>Команда i01</b>`)
+            await sendUsersIntensiveTest(ctx, await calcNowDate())
             // await sendUsersIntensive2_0(ctx, alex, await calcNowDate())
             break
         case "/i57":
@@ -243,24 +248,14 @@ async function openAccessAll(){
 async function calculateAllIndexOfLink(fullWeek) {
     const today = new Date();
     const dayOfWeek = today.getUTCDay();
-    // "id": "01-03",
+      // console.log("dayOfWeek ----- ", dayOfWeek )
     let indexLink = null
-    if (dayOfWeek <= 5) {
-        if (fullWeek <= 9) {
-            indexLink = "0" + fullWeek + "-05"//+ dayOfWeek
-        } else {
-            indexLink = fullWeek + "-05" //+ dayOfWeek
-        }
-    } else {
-        if (fullWeek <= 9) {
-            indexLink = "0" + fullWeek + "-01" //+ dayOfWeek
-        } else {
-            indexLink = fullWeek + "-01"  //+ dayOfWeek
-        }
+    if (dayOfWeek === 0 || dayOfWeek === 6) {
+        indexLink = (fullWeek <= 9 ? "0" + fullWeek : fullWeek) + "-01";
+    } else if (dayOfWeek <= 5) {
+        indexLink = (fullWeek <= 9 ? "0" + fullWeek : fullWeek) + "-0" + dayOfWeek;
     }
-
-
-    // console.log(indexLink)
+    // console.log("indexLink --- ", indexLink)
     return indexLink
 }
 
@@ -407,6 +402,49 @@ async function sendUsersIntensive2_0(ctx, newArrayIntensive, date ) {
         }, 20000 * i)
     }
     await ctx.replyWithHTML(`Отправка закончена`)
+}
+
+exports.sendUsersIntensiveTest = async (ctx) => {
+    const date= await calcNowDate()
+    const newArrayIntensive = await createListOFSending(ctx, arraySend)
+    for (let i = 0; i < newArrayIntensive.length; i++) {
+        setTimeout(() => {
+            try {
+                ctx.telegram.getChatMember(newArrayIntensive[i].chatId, newArrayIntensive[i].chatId).then(async (chatMember) => {
+                    // console.log("chatMember ----", chatMember.status)
+                    if (chatMember.status === 'left' || chatMember.status === 'kicked' || chatMember.status === 'restricted') {
+                        console.log('User is not available')
+                    } else {
+                        // console.log(newArrayIntensive[i])
+                        try {
+                            await ctx.telegram.sendMessage(newArrayIntensive[i].chatId, `Доброго времени суток ${newArrayIntensive[i].name}\n\nДЗ от ${date} (${newArrayIntensive[i].indexWeek})\n` +
+                                `\n` +
+                                `${newArrayIntensive[i].link}\n`
+                            )
+                            await callDb.saveSandingToDB(newArrayIntensive[i], newArrayIntensive[i].link, newArrayIntensive[i].indexVideo)
+                            await ctx.reply(`${newArrayIntensive[i].name} отправлено`)
+                        } catch (error) {
+                            if (error.response.error_code === 403) {
+                                console.log(`Failed to send message to user ${newArrayIntensive[i].name} with chatId ${newArrayIntensive[i].chatId}. Error: ${error.response.description}`);
+                            } else if (error.response.error_code === 400) {
+                                console.log(`Failed to send message to user ${newArrayIntensive[i].name} with chatId ${newArrayIntensive[i].chatId}. Error: ${error.response.description}`);
+                            } else {
+                                console.log(error);
+                            }
+                        }
+                    }
+                })
+            } catch (error) {
+                if (error.response.error_code === 400) {
+                    console.log(`Failed to send message to user ${newArrayIntensive[i].name} with chatId ${newArrayIntensive[i].chatId}. Error: ${error.response.description}`);
+                } else {
+                    console.log(error);
+                }
+            }
+
+        }, 10000 * i)
+    }
+    await ctx.reply(`Отправка закончена`)
 }
 
 
@@ -585,6 +623,7 @@ async function convertUserIntensive() {
         }
     });
     for (let i = 0; i < newArray.length; i++) {
+        // await callDb.createUserForTest(newArray[i])
         const user = await callDb.checkUserForIntensive(newArray[i].chatId)
         if (user) {
             console.log("найден ---", newArray[i].name ,"----", newArray[i].chatId)
@@ -592,6 +631,7 @@ async function convertUserIntensive() {
             console.log("не найден ---", newArray[i].name, "----", newArray[i].chatId)
             if(newArray[i].assess){
                 await callDb.createUserForIntensive(newArray[i])
+                await callDb.createUserForTest(newArray[i])
             }
         }
     }
@@ -621,15 +661,20 @@ async function findHelenForSend(arraySend) {
     console.log("noFind ---", noFind)
 }
 
-async function createListOFSending(ctx, arraySend) {  //command is list
-    const newData = await callDb.findAllIntensive()
+
+
+exports.createListOFSending = async () => {  //command is list
+    const newData = await callDb.findAllIntensive() // формирование реального списка
+    // const newData = await callDb.findAllTest() // формирование тестового списка
     const dataBefore56 = []
-    const dataAfter56 = []
     for (let i = 0; i < newData.length; i++) {
         const fullMonth = await calculateMonthsSinceBirth(newData[i].dataValues.birthday_telegram)
         const fullWeek = await calculateWeeksSinceBirth(newData[i].dataValues.birthday_telegram)
+        // console.log("fullMonth ---", fullMonth)
+        // console.log("fullWeek ---", fullWeek)
         if (fullWeek <= 56) {
             const linkVideo = await calculateLinkForSending(fullWeek, arraySend)
+            // console.log("linkVideo ---", linkVideo)
             dataBefore56.push({
                 numberMonth: fullMonth,
                 numberWeek: fullWeek,
@@ -640,20 +685,13 @@ async function createListOFSending(ctx, arraySend) {  //command is list
                 name: newData[i].dataValues.real_name_telegram,
                 birthday: newData[i].dataValues.birthday_telegram,
             })
-        }else {
-            dataAfter56.push({
-                numberMonth: fullMonth,
-                numberWeek: fullWeek,
-                chatId: newData[i].dataValues.chatId,
-                name: newData[i].dataValues.real_name_telegram,
-                birthday: newData[i].dataValues.birthday_telegram,
-            })
-
         }
     }
-    console.log("dataBefore56 ---", dataBefore56)
-    console.log("dataAfter56 ---", dataAfter56)
+    // console.log("dataBefore56 ---", dataBefore56)
+    return dataBefore56
 }
+
+
 
 async function createListOFSendingAfter56Week() {  //command is list57
     const newArray = await callDb.findAll()

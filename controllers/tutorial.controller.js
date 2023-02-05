@@ -58,9 +58,34 @@ exports.createUserForIntensive = async (data) => {
             console.log(err)
         })
 }
+exports.createUserForTest = async (data) => {
+    const newUser = {
+        email_telegram: data.email,
+        real_name_telegram: data.name,
+        baby_name_telegram: data.babyName,
+        birthday_telegram: data.birthdayBaby,
+        chatId: data.chatId,
+        first_name_telegram: data.first_name_telegram,
+    };
+    await dataBot.Test.create(newUser)
+        .catch(err => {
+            console.log(err)
+        })
+}
 
 exports.findAllIntensive = async (req, res) => {
     return await dataBot.Intensive.findAll({ where: { send: true }})
+        .then(user => {
+            // console.log(user)
+            return user;
+        })
+        .catch(err => {
+            console.log(err)
+            return err;
+        });
+};
+exports.findAllTest = async (req, res) => {
+    return await dataBot.Test.findAll({ where: { send: true }})
         .then(user => {
             // console.log(user)
             return user;
@@ -108,7 +133,7 @@ exports.findAllIntensive2_0 = async (req, res) => {
 
 // Retrieve all Tutorials from the database.
 exports.findAll = async (req, res) => {
-    return await dataBot.Tutorial.findAll()
+    return await dataBot.Tutorial.findAll( { where: { assess_homeworks: true}})
         .then(user => {
             // console.log(data)
             return user;

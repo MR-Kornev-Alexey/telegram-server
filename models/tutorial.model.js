@@ -193,6 +193,38 @@ module.exports = (sequelize, Sequelize) => {
             defaultValue: 'add2'
         }
     });
+    const Test = sequelize.define("test", {
+        chatId: {
+            type: Sequelize.BIGINT,
+            primaryKey: true,
+            autoIncrement: true
+        },
+        name_telegram: {
+            type: Sequelize.STRING
+        },
+        first_name_telegram: {
+            type: Sequelize.STRING
+        },
+        last_name_telegram: {
+            type: Sequelize.STRING
+        },
+        baby_name_telegram: {
+            type: Sequelize.STRING,
+            defaultValue: 'not-data'
+        },
+        birthday_telegram: {
+            type: Sequelize.STRING,
+            defaultValue: 'not-data'
+        },
+        real_name_telegram: {
+            type: Sequelize.STRING,
+            defaultValue: 'not-data'
+        },
+        send:{
+            type: Sequelize.BOOLEAN,
+            defaultValue: true
+        }
+    });
     const Helen = sequelize.define("helen", {
         chatId: {
             type: Sequelize.BIGINT,
@@ -240,5 +272,5 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.INTEGER,
         }
     });
-    return { Tutorial, HomeworksMark, Intensive, SendBlocked, Helen, Sending, IndexOfSend57};
+    return { Tutorial, HomeworksMark, Intensive, SendBlocked, Helen, Sending, IndexOfSend57, Test};
 };
