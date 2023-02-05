@@ -75,6 +75,9 @@ cron.schedule('0 5 * * 1-5', () => {
 
     console.log('Running task every Monday -  Friday at 6 AM Moscow time');
 });
+cron.schedule('*/10 * * * *', () => {
+    helen.telegram.sendMessage(1081994928, `Running task every 10 min`).then(r => {})
+});
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 function dataReducer(state = {data: []}, action) {
