@@ -23,31 +23,38 @@ class dreamStartSceneGenerator {
             '\n' +
             'Перед началом работы походите по вкладкам меню, для лучшей ориентации.\n'
 
+        let buttonStartPressed = false;
 
         async function startMainDreamMenu(ctx) {
-            try {
-                await ctx.reply(firstText,
-                    {
-                        reply_markup: {
-                            inline_keyboard: [
-                                [
-                                    {text: 'СТАРТ', callback_data: 'start_data_dream'}
-                                ],
-                                [{text: "📕 Закрыть", callback_data: 'close_dream_begin'}]
-                            ]
-                        }
-                    },
-                    await getMainMenuDream()
-                )
-            } catch (e) {
-                console.log(e)
+            if (!buttonStartPressed) {
+                buttonStartPressed = true;
+                try {
+                    await ctx.reply(firstText,
+                        {
+                            reply_markup: {
+                                inline_keyboard: [
+                                    [
+                                        {text: 'СТАРТ', callback_data: 'start_data_dream'}
+                                    ],
+                                    [{text: "📕 Закрыть", callback_data: 'close_dream_begin'}]
+                                ]
+                            }
+                        },
+                        await getMainMenuDream()
+                    )
+                } catch (e) {
+                    console.log(e)
+                } finally {
+                    buttonStartPressed = false;
+                }
             }
-
         }
-
+        let buttonStartBeginPressed = false;
         dream_begin.enter(
             async (ctx) => {
-                try{
+                if (!buttonStartBeginPressed) {
+                    buttonStartBeginPressed = true;
+                try {
                     const user = ctx.scene.state.user;
                     await callDb.getOneUser(user)
                         .then(async (result) => {
@@ -70,11 +77,14 @@ class dreamStartSceneGenerator {
                                 console.log(e)
                             }
                         )
-                }catch (e) {
+                } catch (e) {
                     console.log(e)
+                } finally {
+                    buttonStartBeginPressed = false;
                 }
-
+                }
             })
+
         dream_begin.action('close_dream_begin', async ctx => {
             const chatId = ctx.update.callback_query.from.id
             const messageId = ctx.update.callback_query.message.message_id
@@ -238,18 +248,24 @@ class dreamStartSceneGenerator {
             '3SxJac3J7p8',
             'l4eRF7nKa_0'
         ]
-
+        let button1Pressed = false;
         dream_start.enter(
             async (ctx) => {
-                try {
-                    await ctx.reply(
-                        `♥️ Выберите, пожалуйста, методику ♥️\n`,
-                        await keyMain()
-                    )
-                } catch (e) {
-                    console.log(e)
+                if (!button1Pressed) {
+                    button1Pressed = true;
+                    try {
+                        await ctx.reply(
+                            `♥️ Выберите, пожалуйста, методику ♥️\n`,
+                            await keyMain()
+                        )
+                    } catch (e) {
+                        console.log(e)
+                    } finally {
+                        button1Pressed = false;
+                    }
                 }
-            })
+            }
+        )
 
         async function keyMain() {
             try {
@@ -278,26 +294,41 @@ class dreamStartSceneGenerator {
 
         }
 
+        let buttonMainPressed = false;
+
         async function mainMenu(ctx) {
-            try {
-                await ctx.reply(
-                    `♥️ Выберите, пожалуйста, методику ♥️\n`,
-                    await keyMain()
-                )
-            } catch (e) {
-                console.log(e)
+            if (!buttonMainPressed) {
+                buttonMainPressed = true;
+                try {
+                    await ctx.reply(
+                        `♥️ Выберите, пожалуйста, методику ♥️\n`,
+                        await keyMain()
+                    )
+                } catch (e) {
+                    console.log(e)
+                } finally {
+                    buttonMainPressed = false;
+                }
             }
         }
 
+        let buttonDataDreamPressed = false;
         dream_start.action('data_dream', async ctx => {
-            try {
-                ctx.answerCbQuery()
-                await mainMenu(ctx)
-                    , await getMainMenuDream()
-            } catch (e) {
-                console.log(e)
+                if (!buttonDataDreamPressed) {
+                    buttonDataDreamPressed = true;
+                    try {
+                        ctx.answerCbQuery()
+                        await mainMenu(ctx)
+                            , await getMainMenuDream()
+                    } catch (e) {
+                        console.log(e)
+                    } finally {
+                        buttonDataDreamPressed = false;
+                    }
+                }
             }
-        });
+        );
+
         dream_start.action('close_dream', async ctx => {
             const chatId = ctx.update.callback_query.from.id
             const messageId = ctx.update.callback_query.message.message_id
@@ -312,218 +343,301 @@ class dreamStartSceneGenerator {
             await ctx.telegram.deleteMessage(chatId, messageId)
         });
 
+        let buttonReturnFramePressed = false;
         dream_start.action('return_frame', async ctx => {
-            try {
-                await ctx.answerCbQuery()
-                const msg = ctx.update.callback_query.message
-                let editedMessage =
-                    `♥️ Выберите, пожалуйста, методику ♥️\n`
-                await ctx.telegram.editMessageText(ctx.chat.id, msg.message_id, undefined, editedMessage, await keyMain())
-            } catch (e) {
-                console.log(e)
+            if (!buttonReturnFramePressed) {
+                buttonReturnFramePressed = true;
+                try {
+                    await ctx.answerCbQuery()
+                    const msg = ctx.update.callback_query.message
+                    let editedMessage =
+                        `♥️ Выберите, пожалуйста, методику ♥️\n`
+                    await ctx.telegram.editMessageText(ctx.chat.id, msg.message_id, undefined, editedMessage, await keyMain())
+                } catch (e) {
+                    console.log(e)
+                } finally {
+                    buttonReturnFramePressed = false;
+                }
             }
         });
 
+        let buttonCommonPressed = false;
+
         async function getMethodCommon(ctx, editedMessage, number) {
-            try {
-                const msg = ctx.update.callback_query.message
-                await ctx.telegram.editMessageText(ctx.chat.id, msg.message_id, undefined, editedMessage, {
-                        reply_markup: {
-                            inline_keyboard: [
-                                [{text: "➡ Дальше", callback_data: 'next_frame_' + number}],
-                                [{text: "⬅️ Назад", callback_data: 'return_frame'}],
-                                [{text: "📕 Закрыть", callback_data: 'close_dream'}]
-                            ]
+            if (!buttonCommonPressed) {
+                buttonCommonPressed = true;
+                try {
+                    const msg = ctx.update.callback_query.message
+                    await ctx.telegram.editMessageText(ctx.chat.id, msg.message_id, undefined, editedMessage, {
+                            reply_markup: {
+                                inline_keyboard: [
+                                    [{text: "➡ Дальше", callback_data: 'next_frame_' + number}],
+                                    [{text: "⬅️ Назад", callback_data: 'return_frame'}],
+                                    [{text: "📕 Закрыть", callback_data: 'close_dream'}]
+                                ]
+                            }
                         }
-                    }
-                )
-            } catch (e) {
-                console.log(e)
+                    )
+                } catch (e) {
+                    console.log(e)
+                } finally {
+                    buttonCommonPressed = false;
+                }
             }
         }
+
+        let buttonNextPressed = false;
 
         async function nextFiveCScreen(ctx, editedMessage, number) {
-            try {
-                const msg = ctx.update.callback_query.message
-                await ctx.telegram.editMessageText(ctx.chat.id, msg.message_id, undefined, editedMessage, {
-                        reply_markup: {
-                            inline_keyboard: [
-                                [{text: "Подготовительный этап", callback_data: 'prepare_' + number}],
-                                [{text: "Ритуалы", callback_data: 'rituals_' + number}],
-                                [{text: "Ночной сон", callback_data: 'sleep_dream_' + number}],
-                                [{text: "Дневной сон", callback_data: 'day_dream_' + number}],
-                                [{text: "Удлинение дневных снов", callback_data: 'long_dream_' + number}],
-                                [{text: "Раннее пробуждение", callback_data: 'early_awakening_' + number}],
-                                [{text: "Важные условия для сна", callback_data: 'important_conditions_' + number}],
-                                [{text: "Ночные кормления", callback_data: 'night_feedings_' + number}],
-                                [{text: "Особенность работы с близнецами, погодками ...", callback_data: 'twins_' + number}],
-                                [{text: "Вопросы - ответы", callback_data: 'questions_answers_' + number}],
-                                [{text: "Гайд для печати", callback_data: 'guide_print_' + number}],
-                                [{text: "⬅️ Назад", callback_data: `back_frame_${number}`}],
-                                [{text: "📕 Закрыть", callback_data: 'close_dream'}]
-                            ]
+            if (!buttonNextPressed) {
+                buttonNextPressed = true;
+                try {
+                    const msg = ctx.update.callback_query.message
+                    await ctx.telegram.editMessageText(ctx.chat.id, msg.message_id, undefined, editedMessage, {
+                            reply_markup: {
+                                inline_keyboard: [
+                                    [{text: "Подготовительный этап", callback_data: 'prepare_' + number}],
+                                    [{text: "Ритуалы", callback_data: 'rituals_' + number}],
+                                    [{text: "Ночной сон", callback_data: 'sleep_dream_' + number}],
+                                    [{text: "Дневной сон", callback_data: 'day_dream_' + number}],
+                                    [{text: "Удлинение дневных снов", callback_data: 'long_dream_' + number}],
+                                    [{text: "Раннее пробуждение", callback_data: 'early_awakening_' + number}],
+                                    [{text: "Важные условия для сна", callback_data: 'important_conditions_' + number}],
+                                    [{text: "Ночные кормления", callback_data: 'night_feedings_' + number}],
+                                    [{
+                                        text: "Особенность работы с близнецами, погодками ...",
+                                        callback_data: 'twins_' + number
+                                    }],
+                                    [{text: "Вопросы - ответы", callback_data: 'questions_answers_' + number}],
+                                    [{text: "Гайд для печати", callback_data: 'guide_print_' + number}],
+                                    [{text: "⬅️ Назад", callback_data: `back_frame_${number}`}],
+                                    [{text: "📕 Закрыть", callback_data: 'close_dream'}]
+                                ]
+                            }
                         }
-                    }
-                )
-            } catch (e) {
-                console.log(e)
+                    )
+                } catch (e) {
+                    console.log(e)
+                } finally {
+                    buttonNextPressed = false;
+                }
             }
         }
+
+        let buttonFourPressed = false;
 
         async function nextFourCScreen(ctx, editedMessage, number) {
-            try {
-                // console.log(editedMessage)
-                const msg = ctx.update.callback_query.message
-                await ctx.telegram.editMessageText(ctx.chat.id, msg.message_id, undefined, editedMessage,
-                    {
-                        reply_markup: {
-                            inline_keyboard: [
-                                [{text: "➡ Этапы работы", callback_data: 'five_frame_' + number}],
-                                [{text: "⬅️ Назад", callback_data: 'return_frame'}],
-                                [{text: "📕 Закрыть", callback_data: 'close_dream'}]
+            if (!buttonFourPressed) {
+                buttonFourPressed = true;
+                try {
+                    // console.log(editedMessage)
+                    const msg = ctx.update.callback_query.message
+                    await ctx.telegram.editMessageText(ctx.chat.id, msg.message_id, undefined, editedMessage,
+                        {
+                            reply_markup: {
+                                inline_keyboard: [
+                                    [{text: "➡ Этапы работы", callback_data: 'five_frame_' + number}],
+                                    [{text: "⬅️ Назад", callback_data: 'return_frame'}],
+                                    [{text: "📕 Закрыть", callback_data: 'close_dream'}]
 
-                            ]
+                                ]
+                            }
                         }
-                    }
-                )
-            } catch (e) {
-                console.log(e)
+                    )
+                } catch (e) {
+                    console.log(e)
+                } finally {
+                    buttonFourPressed = false;
+                }
             }
-
         }
+
+        let buttonSixPressed = false;
 
         async function nextSixScreenOne(ctx, editedMessage, number) {
-            try {
-                const msg = ctx.update.callback_query.message
-                await ctx.telegram.editMessageText(ctx.chat.id, msg.message_id, undefined, editedMessage, {
-                        reply_markup: {
-                            inline_keyboard: [
-                                [{text: "⬅️ Назад", callback_data: `bak6_frame_${number}`}],
-                                [{text: "📕 Закрыть", callback_data: 'close_dream'}]
-                            ]
+            if (!buttonSixPressed) {
+                buttonSixPressed = true;
+                try {
+                    const msg = ctx.update.callback_query.message
+                    await ctx.telegram.editMessageText(ctx.chat.id, msg.message_id, undefined, editedMessage, {
+                            reply_markup: {
+                                inline_keyboard: [
+                                    [{text: "⬅️ Назад", callback_data: `bak6_frame_${number}`}],
+                                    [{text: "📕 Закрыть", callback_data: 'close_dream'}]
+                                ]
+                            }
                         }
-                    }
-                )
-            } catch (e) {
-                console.log(e)
+                    )
+                } catch (e) {
+                    console.log(e)
+                } finally {
+                    buttonSixPressed = false;
+                }
             }
         }
+
+        let buttonSixScreenOnePressed = false;
 
         async function nextSixScreenOneFaq(ctx, editedMessage, number) {
-            try {
-                const msg = ctx.update.callback_query.message
-                await ctx.telegram.editMessageText(ctx.chat.id, msg.message_id, undefined, editedMessage, {
-                        reply_markup: {
-                            inline_keyboard: [
-                                [{text: "⬅️ Назад", callback_data: `bak9_frame_${number}`}],
-                                [{text: "📕 Закрыть", callback_data: 'close_dream'}]
-                            ]
+            if (!buttonSixScreenOnePressed) {
+                buttonSixScreenOnePressed = true;
+                try {
+                    const msg = ctx.update.callback_query.message
+                    await ctx.telegram.editMessageText(ctx.chat.id, msg.message_id, undefined, editedMessage, {
+                            reply_markup: {
+                                inline_keyboard: [
+                                    [{text: "⬅️ Назад", callback_data: `bak9_frame_${number}`}],
+                                    [{text: "📕 Закрыть", callback_data: 'close_dream'}]
+                                ]
+                            }
                         }
-                    }
-                )
-            } catch (e) {
-                console.log(e)
+                    )
+                } catch (e) {
+                    console.log(e)
+                } finally {
+                    buttonSixScreenOnePressed = false;
+                }
             }
         }
+
+        let button7Pressed = false;
 
         async function nextSevenCScreen(ctx, editedMessage, number) {
-            try {
-                const msg = ctx.update.callback_query.message
-                await ctx.telegram.editMessageText(ctx.chat.id, msg.message_id, undefined, editedMessage, {
-                        reply_markup: {
-                            inline_keyboard: [
-                                [{text: "⬅️ Назад", callback_data: `bak7_frame_${number}`}],
-                                [{text: "📕 Закрыть", callback_data: 'close_dream'}]
-                            ]
+            if (!button7Pressed) {
+                button7Pressed = true;
+                try {
+                    const msg = ctx.update.callback_query.message
+                    await ctx.telegram.editMessageText(ctx.chat.id, msg.message_id, undefined, editedMessage, {
+                            reply_markup: {
+                                inline_keyboard: [
+                                    [{text: "⬅️ Назад", callback_data: `bak7_frame_${number}`}],
+                                    [{text: "📕 Закрыть", callback_data: 'close_dream'}]
+                                ]
+                            }
                         }
-                    }
-                )
-            } catch (e) {
-                console.log(e)
+                    )
+                } catch (e) {
+                    console.log(e)
+                } finally {
+                    button7Pressed = false;
+                }
             }
         }
+
+        let buttonPressed = false;
 
         async function nextEightScreen(ctx, editedMessage, number) {
-            try {
-                const msg = ctx.update.callback_query.message
-                await ctx.telegram.editMessageText(ctx.chat.id, msg.message_id, undefined, editedMessage, {
-                        reply_markup: {
-                            inline_keyboard: [
-                                [{text: "⬅️ Назад", callback_data: `bak8_frame_${number}`}],
-                                [{text: "📕 Закрыть", callback_data: 'close_dream'}]
-                            ]
+            if (!buttonPressed) {
+                buttonPressed = true;
+                try {
+                    const msg = ctx.update.callback_query.message;
+                    await ctx.telegram.editMessageText(
+                        ctx.chat.id,
+                        msg.message_id,
+                        undefined,
+                        editedMessage,
+                        {
+                            reply_markup: {
+                                inline_keyboard: [
+                                    [{text: "⬅️ Назад", callback_data: `bak8_frame_${number}`}],
+                                    [{text: "📕 Закрыть", callback_data: "close_dream"}]
+                                ]
+                            }
                         }
-                    }
-                )
-            } catch (e) {
-                console.log(e)
+                    );
+                } catch (e) {
+                    console.log(e);
+                } finally {
+                    buttonPressed = false;
+                }
             }
         }
+
+        let buttonSevenScreenFAQPressed = false;
 
         async function nextSevenScreenFAQ(ctx, editedMessage, number) {
-            try {
-                const msg = ctx.update.callback_query.message
-                await ctx.telegram.editMessageText(ctx.chat.id, msg.message_id, undefined, editedMessage, {
-                        reply_markup: {
-                            inline_keyboard: [
-                                // [{text: "Я сдалась ", callback_data: `faq7_0`}],
-                                [{text: "Стресс и привязанность при плаче", callback_data: `faq7_1`}],
-                                [{text: "Обязательная поддержка родных ", callback_data: `faq7_2`}],
-                                [{text: "Ассоциация на пустышку", callback_data: `faq7_3`}],
-                                [{text: "Как успокоится маме ", callback_data: `faq7_4`}],
-                                [{text: "Какание при засыпании ", callback_data: `faq7_5`}],
-                                [{text: "Пеленание ребенка", callback_data: `faq7_6`}],
-                                [{text: "Рвота при засыпании ", callback_data: `faq7_7`}],
-                                [{text: "Раскачивается во время засыпания", callback_data: `faq7_8`}],
-                                [{text: "Сосание пальчика при засыпании", callback_data: `faq7_9`}],
-                                [{text: "⬅️ Назад", callback_data: `bak6_frame_${number}`}],
-                                [{text: "📕 Закрыть", callback_data: 'close_dream'}]
-                            ]
+            if (!buttonSevenScreenFAQPressed) {
+                buttonSevenScreenFAQPressed = true;
+                try {
+                    const msg = ctx.update.callback_query.message
+                    await ctx.telegram.editMessageText(ctx.chat.id, msg.message_id, undefined, editedMessage, {
+                            reply_markup: {
+                                inline_keyboard: [
+                                    // [{text: "Я сдалась ", callback_data: `faq7_0`}],
+                                    [{text: "Стресс и привязанность при плаче", callback_data: `faq7_1`}],
+                                    [{text: "Обязательная поддержка родных ", callback_data: `faq7_2`}],
+                                    [{text: "Ассоциация на пустышку", callback_data: `faq7_3`}],
+                                    [{text: "Как успокоится маме ", callback_data: `faq7_4`}],
+                                    [{text: "Какание при засыпании ", callback_data: `faq7_5`}],
+                                    [{text: "Пеленание ребенка", callback_data: `faq7_6`}],
+                                    [{text: "Рвота при засыпании ", callback_data: `faq7_7`}],
+                                    [{text: "Раскачивается во время засыпания", callback_data: `faq7_8`}],
+                                    [{text: "Сосание пальчика при засыпании", callback_data: `faq7_9`}],
+                                    [{text: "⬅️ Назад", callback_data: `bak6_frame_${number}`}],
+                                    [{text: "📕 Закрыть", callback_data: 'close_dream'}]
+                                ]
+                            }
                         }
-                    }
-                )
-            } catch (e) {
-                console.log(e)
+                    )
+                } catch (e) {
+                    console.log(e)
+                } finally {
+                    buttonSevenScreenFAQPressed = false;
+                }
             }
         }
+
+        let buttonSevenScreenScreenRitualsPressed = false;
 
         async function nextSevenCScreenRituals(ctx, editedMessage, number) {
-            try {
-                const msg = ctx.update.callback_query.message
-                await ctx.telegram.editMessageText(ctx.chat.id, msg.message_id, undefined, editedMessage, {
-                        reply_markup: {
-                            inline_keyboard: [
-                                [{text: "Ритуал на дневное пробуждение", callback_data: `rit7_1`}],
-                                [{text: "Ритуал на засыпание", callback_data: `rit7_2`}],
-                                [{text: "Ритуал на дневной сон", callback_data: `rit7_3`}],
-                                [{text: "⬅️ Назад", callback_data: `bak6_frame_${number}`}],
-                                [{text: "📕 Закрыть", callback_data: 'close_dream'}]
-                            ]
+            if (!buttonSevenScreenScreenRitualsPressed) {
+                buttonSevenScreenScreenRitualsPressed = true;
+                try {
+                    const msg = ctx.update.callback_query.message
+                    await ctx.telegram.editMessageText(ctx.chat.id, msg.message_id, undefined, editedMessage, {
+                            reply_markup: {
+                                inline_keyboard: [
+                                    [{text: "Ритуал на дневное пробуждение", callback_data: `rit7_1`}],
+                                    [{text: "Ритуал на засыпание", callback_data: `rit7_2`}],
+                                    [{text: "Ритуал на дневной сон", callback_data: `rit7_3`}],
+                                    [{text: "⬅️ Назад", callback_data: `bak6_frame_${number}`}],
+                                    [{text: "📕 Закрыть", callback_data: 'close_dream'}]
+                                ]
+                            }
                         }
-                    }
-                )
-            } catch (e) {
-                console.log(e)
+                    )
+                } catch (e) {
+                    console.log(e)
+                } finally {
+                    buttonSevenScreenScreenRitualsPressed = false;
+                }
             }
         }
 
+        let buttonSevenScreenSleepPressed = false;
+
         async function nextSevenScreenSleep(ctx, editedMessage, number) {
-            try {
-                const msg = ctx.update.callback_query.message
-                await ctx.telegram.editMessageText(ctx.chat.id, msg.message_id, undefined, editedMessage, {
-                        reply_markup: {
-                            inline_keyboard: [
-                                [{text: "Первый день", callback_data: `first_frame_${number}`}],
-                                [{text: "Второй и следующие дни ", callback_data: `second_frame_${number}`}],
-                                [{text: "Первые результаты", callback_data: `results_frame_${number}`}],
-                                [{text: "⬅️ Назад", callback_data: `bak6_frame_${number}`}],
-                                [{text: "📕 Закрыть", callback_data: 'close_dream'}]
-                            ]
+            if (!buttonSevenScreenSleepPressed) {
+                buttonSevenScreenSleepPressed = true;
+                try {
+                    const msg = ctx.update.callback_query.message
+                    await ctx.telegram.editMessageText(ctx.chat.id, msg.message_id, undefined, editedMessage, {
+                            reply_markup: {
+                                inline_keyboard: [
+                                    [{text: "Первый день", callback_data: `first_frame_${number}`}],
+                                    [{text: "Второй и следующие дни ", callback_data: `second_frame_${number}`}],
+                                    [{text: "Первые результаты", callback_data: `results_frame_${number}`}],
+                                    [{text: "⬅️ Назад", callback_data: `bak6_frame_${number}`}],
+                                    [{text: "📕 Закрыть", callback_data: 'close_dream'}]
+                                ]
+                            }
                         }
-                    }
-                )
-            } catch (e) {
-                console.log(e)
+                    )
+                } catch (e) {
+                    console.log(e)
+                } finally {
+                    buttonSevenScreenSleepPressed = false;
+                }
             }
         }
 
@@ -611,22 +725,30 @@ class dreamStartSceneGenerator {
             }
 
         });
-        dream_start.on('message', async (ctx) => {
-            try {
-                await ctx.reply('Это я пока не понимаю. Идем в начало?', {
-                        reply_markup: {
-                            inline_keyboard: [
-                                [{text: "📕 Закрыть", callback_data: 'close_frame'}]
-                            ]
-                        }
-                    }
-                )
-                await ctx.scene.reenter()
-            } catch (e) {
-                console.log(e)
-            }
 
-        })
+        let buttonMessagePressed = false;
+        dream_start.on('message', async (ctx) => {
+                if (!buttonMessagePressed) {
+                    buttonMessagePressed = true;
+                    try {
+                        await ctx.reply('Это я пока не понимаю. Идем в начало?', {
+                                reply_markup: {
+                                    inline_keyboard: [
+                                        [{text: "📕 Закрыть", callback_data: 'close_frame'}]
+                                    ]
+                                }
+                            }
+                        )
+                        await ctx.scene.reenter()
+                    } catch (e) {
+                        console.log(e)
+                    } finally {
+                        buttonMessagePressed = false;
+                    }
+                }
+            }
+        )
+
         return dream_start
     }
 }

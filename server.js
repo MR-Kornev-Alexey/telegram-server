@@ -70,13 +70,8 @@ cron.schedule('0 6 * * 1-5', async () => {
     await sendUsersNew(helen)
 });
 
-cron.schedule('0 5 * * 1-5', () => {
-    helen.telegram.sendMessage(1081994928, `Running task every Monday -  Friday at 6 AM Moscow time`).then(r => {})
-
-    console.log('Running task every Monday -  Friday at 6 AM Moscow time');
-});
-cron.schedule('*/10 * * * *', () => {
-    helen.telegram.sendMessage(1081994928, `Running task every 10 min`).then(r => {})
+cron.schedule('*/20 * * * *', () => {
+    helen.telegram.sendMessage(1081994928, `Running task every 20 min`).then(r => {})
 });
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -338,7 +333,7 @@ process.once('SIGTERM', () => dream.stop('SIGTERM'));
 //============================================================================
 
 // set port, listen for requests
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 8081;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}.`);
 });

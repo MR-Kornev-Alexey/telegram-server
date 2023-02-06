@@ -164,7 +164,7 @@ async function nextStep(ctx) {
             break
         case "/i57":
             await ctx.replyWithHTML(`<b>Команда i57</b>`)
-            await sendUsersIntensive2_0_14(ctx, after57, 18, await calcNowDate())
+            await sendUsersIntensive2_0_14(ctx, after57, 19, await calcNowDate())
             // await sendUsersIntensive2_0_14(ctx, alex, 13, await calcNowDate())
             // await sendUsersIntensive2_0_14(ctx, myasgo , 13, await calcNowDate())
             break
