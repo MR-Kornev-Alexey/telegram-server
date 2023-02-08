@@ -84,6 +84,17 @@ exports.findAllIntensive = async (req, res) => {
             return err;
         });
 };
+exports.findAllDream = async (req, res) => {
+    return await dataBot.Tutorial.findAll({ where: { access_dream: true }})
+        .then(user => {
+            // console.log(user)
+            return user;
+        })
+        .catch(err => {
+            console.log(err)
+            return err;
+        });
+};
 exports.findAllTest = async (req, res) => {
     return await dataBot.Test.findAll({ where: { send: true }})
         .then(user => {
@@ -143,6 +154,8 @@ exports.findAll = async (req, res) => {
             return err;
         });
 };
+
+
 
 exports.searchWatch = async (req, res) => {
     const { userId, urlLink } = req;
@@ -351,6 +364,17 @@ exports.getNumber = async () => {
     } catch (err) {
         console.log(err);
         throw err;
+    }
+};
+exports.getNumberIndex = async () => {
+    try {
+        const record = await dataBot.IndexOfSend57.findOne({
+            where: { id: 1 }
+        });
+        return record.dataValues;
+    } catch (error) {
+        console.error(error);
+        return false;
     }
 };
 

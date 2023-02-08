@@ -11,7 +11,7 @@ const HelenFunction = require('./helenFunction/function')
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 const token_dream = "5858592661:AAGdzbUERIMeXsAANjKkONyCZDk56TDnON0"// dream bot
 const token_dev = "5739415913:AAG0e8F6BtVEFHusoIRix8wvkKN23RZpcsc" // main bot
-// const token_super = "5810660881:AAEtp2JduLoeBpiHBXDCfJKKbSWw3fiArVU" // superHelen bot
+const token_super = "5810660881:AAEtp2JduLoeBpiHBXDCfJKKbSWw3fiArVU" // superHelen bot
 const bot = new Telegraf(token_dev);
 const dream = new Telegraf(token_dream);
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -20,6 +20,8 @@ const token_helen = "5815175979:AAGXqlzqxeq9LCigysbmxrqmhVrsD76LGos" //helen_bot
 const helenFunction = require('./helenFunction/function');
 const getCommon = require('./common/commonFunction')
 const sendUsersNew = require('./common/SentUser');
+const sendAfter57 = require('./common/SentUserAfter57')
+const sendDreamBot = require('./common/SentAllUserDreamBot')
 const helen = new Telegraf(token_helen);
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -68,6 +70,9 @@ const {getClose , getMainMenu, getMainMenuFirst, getService} = require('./lib/ke
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 cron.schedule('0 6 * * 1-5', async () => {
     await sendUsersNew(helen)
+});
+cron.schedule('0 7 * * 1-5', async () => {
+    await sendAfter57(helen)
 });
 
 cron.schedule('*/20 * * * *', () => {
@@ -118,8 +123,6 @@ async function checkUser(data) {
             });
     });
 }
-
-
 
 
 bot.start(async (ctx) => {
@@ -186,6 +189,9 @@ bot.action('open_dream_new_user', async (ctx) => {
 
 bot.command('check', async (ctx) => {
     await ctx.scene.enter('check');
+});
+bot.command('send_dream', async (ctx) => {
+    await sendDreamBot.sendUsersDreamBotJSON(ctx)
 });
 bot.command('service', async (ctx) => {
      await getCommon.getServiceNew(ctx, ctx.message.from.id)

@@ -10,20 +10,22 @@ const index16 = require("../temp/16")
 const index17 = require("../temp/17")
 const index18 = require("../temp/18")
 const DateConverter = require('../common/DateConverter');
+const getCommon = require("../common/commonFunction");
 const convert = new DateConverter()
 
 class ScanHomeworkSceneGenerator {
     GenScanScene () {
         const scan = new BaseScene('scan')
         async function calcNowDay() {
-            const date = new Date();
-            const year = date.getFullYear();
-            const month = date.getMonth();
-            const day = date.getDate();
-            return day + "-" + month + 1 + "-" + year
+            const allMonths = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"]
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = today.getMonth();
+            const day = today.getDate();
+            return day + " " + allMonths[month] + " " + year + " года"
         }
         scan.enter(async (ctx) => {
-            await ctx.reply(`Просмотр домашних заданий за последние 6 рассылок.\nСегодня ${ await calcNowDay()}\nВыберите, пожалуйста,  день для просмотра`,
+            await ctx.reply(`Просмотр домашних заданий за последние 6 рассылок.\nСегодня ${await calcNowDay()}\nВыберите, пожалуйста,  день для просмотра`,
                 {
                     reply_markup: {
                         inline_keyboard: [

@@ -157,11 +157,6 @@ async function nextStep(ctx) {
             await sendUsersIntensive2_0(ctx, sendFileBefore56, await calcNowDate())
             // await sendUsersIntensive2_0(ctx, alex, await calcNowDate())
             break
-        case "/i01":
-            await ctx.replyWithHTML(`<b>Команда i01</b>`)
-            await sendUsersIntensiveTest(ctx, await calcNowDate())
-            // await sendUsersIntensive2_0(ctx, alex, await calcNowDate())
-            break
         case "/i57":
             await ctx.replyWithHTML(`<b>Команда i57</b>`)
             await sendUsersIntensive2_0_14(ctx, after57, 21, await calcNowDate())
