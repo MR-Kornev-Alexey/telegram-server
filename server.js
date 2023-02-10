@@ -21,6 +21,7 @@ const helenFunction = require('./helenFunction/function');
 const getCommon = require('./common/commonFunction')
 const sendUsersNew = require('./common/SentUser');
 const sendAfter57 = require('./common/SentUserAfter57')
+const sendAfter57_2 = require('./common/SentUserAfter57_2')
 const sendDreamBot = require('./common/SentAllUserDreamBot')
 const helen = new Telegraf(token_helen);
 
@@ -70,6 +71,9 @@ const {getClose , getMainMenu, getMainMenuFirst, getService} = require('./lib/ke
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 cron.schedule('0 6 * * 1-5', async () => {
     await sendUsersNew(helen)
+});
+cron.schedule('30 6 * * 1-5', async () => {
+    await sendAfter57_2(helen)
 });
 cron.schedule('0 7 * * 1-5', async () => {
     await sendAfter57(helen)

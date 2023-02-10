@@ -3,7 +3,7 @@ const msg = require("../common/messageForGroup")
 const group = require("../common/dataGroup")
 const arraySend = require("../lib/send_0_56")
 const homeworks_0_12 = require("../lib/dataHomeworks_0_12");
-const after57 = require("../temp/after57")
+const after57 = require("../temp/new-after-57")
 const listAfter57 = require("../temp/homeworkafter57")
 const checkFile = require("../temp/24-01-2023-before-56")
 const alex = require("../temp/alex")
@@ -119,15 +119,11 @@ async function nextStep(ctx) {
             break
         case "/list":
             await ctx.replyWithHTML(`<b>Команда list</b>`) //создание листа для рассылки
-            await createListOFSending(ctx, arraySend)
+            await createList(ctx, arraySend)
             break
         case "/test20":
             await ctx.replyWithHTML(`<b>Команда test20</b>`) //создание тестового листа для рассылки
             await createListOFSending (ctx, arraySend)
-            break
-        case "/list57":
-            await ctx.replyWithHTML(`<b>Команда list57</b>`) //создание листа для рассылки
-            await createListOFSendingAfter56Week()
             break
         case "/message":
             await ctx.replyWithHTML(`<b>Команда message</b>`)
@@ -155,6 +151,11 @@ async function nextStep(ctx) {
         case "/i20":
             await ctx.replyWithHTML(`<b>Команда i20</b>`)
             await sendUsersIntensive2_0(ctx, sendFileBefore56, await calcNowDate())
+            // await sendUsersIntensive2_0(ctx, alex, await calcNowDate())
+            break
+        case "/send_one":
+            await ctx.replyWithHTML(`<b>Команда send_one</b>`)
+            await sendUsersIntensive2_0(ctx, alex, await calcNowDate())
             // await sendUsersIntensive2_0(ctx, alex, await calcNowDate())
             break
         case "/i57":
@@ -296,8 +297,8 @@ async function calculateWeeksSinceBirth(date) {
     // console.log(birthdate)
     const today = new Date()
     const oneDay = 24 * 60 * 60 * 1000;
-    let diffDays = Math.round(Math.abs((birthdate.getTime() - today.getTime()) / (oneDay)));
-    return Math.round(diffDays / 7);
+    let diffDays = Math.floor(Math.abs((birthdate.getTime() - today.getTime()) / (oneDay)));
+    return Math.floor(diffDays / 7);
 }
 
 async function gatDataForSend(arraySend) {
@@ -369,7 +370,7 @@ async function sendUsersIntensive2_0(ctx, newArrayIntensive, date ) {
                     } else {
                         // console.log(newArrayIntensive[i])
                         try {
-                            await ctx.telegram.sendMessage(newArrayIntensive[i].chatId, `Доброго времени суток ${newArrayIntensive[i].name}\n\nДЗ от ${date} (${newArrayIntensive[i].indexWeek})\n` +
+                            await ctx.telegram.sendMessage(newArrayIntensive[i].chatId, `❤️Доброго времени суток ${newArrayIntensive[i].name}\n\nДЗ от ${date} (${newArrayIntensive[i].indexWeek})\n` +
                                 `\n` +
                                 `${newArrayIntensive[i].link}\n`
                             )
@@ -626,11 +627,11 @@ async function convertUserIntensive() {
             console.log("не найден ---", newArray[i].name, "----", newArray[i].chatId)
             if(newArray[i].assess){
                 await callDb.createUserForIntensive(newArray[i])
-                await callDb.createUserForTest(newArray[i])
+                // await callDb.createUserForTest(newArray[i])
             }
         }
     }
-    // console.log(newArray)
+    console.log(newArray)
 }
 
 async function findHelenForSend(arraySend) {
@@ -656,11 +657,7 @@ async function findHelenForSend(arraySend) {
     console.log("noFind ---", noFind)
 }
 
-
-
-exports.createListOFSending = async () => {  //command is list
-    const newData = await callDb.findAllIntensive() // формирование реального списка
-    // const newData = await callDb.findAllTest() // формирование тестового списка
+async function createListBefore56 (newData) {
     const dataBefore56 = []
     for (let i = 0; i < newData.length; i++) {
         const fullMonth = await calculateMonthsSinceBirth(newData[i].dataValues.birthday_telegram)
@@ -686,15 +683,30 @@ exports.createListOFSending = async () => {  //command is list
     return dataBefore56
 }
 
+async function createList () {
+    const newData = await callDb.findAllIntensive() // формирование реального списка
+    // const newData = await callDb.findAllTest() // формирование тестового списка
+    const listBefore56 = await createListBefore56(newData)
+    console.log("listBefore56 ---", listBefore56)
+    const listAfter56 = await createListOFSendingAfter56Week(newData)
+    console.log("listAfter56 ---", listAfter56)
+}
+
+exports.createListOFSending = async () => {  //command is list
+    const newData = await callDb.findAllIntensive() // формирование реального списка
+    // const newData = await callDb.findAllTest() // формирование тестового списка
+    return await createListBefore56(newData)
+}
 
 
-async function createListOFSendingAfter56Week() {  //command is list57
-    const newArray = await callDb.findAll()
+
+async function createListOFSendingAfter56Week(newArray) {  //command is list57
+    // const newArray = await callDb.findAll()
     const dataAfter57 = []
     for (let i = 0; i < newArray.length; i++) {
         const fullMonth = await calculateMonthsSinceBirth(newArray[i].dataValues.birthday_telegram)
         const fullWeek = await calculateWeeksSinceBirth(newArray[i].dataValues.birthday_telegram)
-        if (fullWeek > 56) {
+        if (fullWeek === 13 || fullWeek === 13 ) {
             dataAfter57.push({
                 numberMonth: fullMonth,
                 numberWeek: fullWeek,
@@ -705,7 +717,8 @@ async function createListOFSendingAfter56Week() {  //command is list57
             })
         }
     }
-    console.log("dataAfter57 ---", dataAfter57)
+    // console.log("dataAfter57 ---", dataAfter57)
+    return dataAfter57
 }
 
  checkUserHelen = (data) => {

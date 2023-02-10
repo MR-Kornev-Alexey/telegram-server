@@ -144,7 +144,7 @@ exports.findAllIntensive2_0 = async (req, res) => {
 
 // Retrieve all Tutorials from the database.
 exports.findAll = async (req, res) => {
-    return await dataBot.Tutorial.findAll( { where: { assess_homeworks: true}})
+    return await dataBot.Tutorial.findAll( { where: { source: 'intensive-1'}})
         .then(user => {
             // console.log(data)
             return user;
@@ -377,10 +377,30 @@ exports.getNumberIndex = async () => {
         return false;
     }
 };
+exports.getNumberIndex_2 = async () => {
+    try {
+        const record = await dataBot.IndexOfSend57.findOne({
+            where: { id: 2 }
+        });
+        return record.dataValues;
+    } catch (error) {
+        console.error(error);
+        return false;
+    }
+};
 
 exports.saveIndex57 = async (data) => {
     await dataBot.IndexOfSend57.update({ indexSent: data }, {
         where: { id: 1 }
+    })
+        .catch(err => {
+            console.log(err)
+        })
+
+}
+exports.saveIndex57_2 = async (data) => {
+    await dataBot.IndexOfSend57.update({ indexSent: data }, {
+        where: { id: 2 }
     })
         .catch(err => {
             console.log(err)

@@ -40,8 +40,11 @@ buttonStatus[data] = true;
 }
 });
 
-Дорогие участники и участницы! 
-Сегодня 17 01 23  Вам было 2 раза отправлены домашние задания. 
-Произошел сбой и ссылки на видео слетели и вам пришло undefined 
-Они отправляются по новому алгоритму и уже должны быть без номеров.
-Кто не получил сегодня домашнее задание - прошу написать мне и срочно подружиться с ботом @mrk_new_bot
+
+const path = require('path')
+
+app.use(express.static(path.join(__dirname, 'dist')))
+
+app.get('*', function (req, res) {
+res.sendFile(path.join(__dirname, 'dist', 'index.html'))
+})

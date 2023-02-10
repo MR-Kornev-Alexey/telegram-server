@@ -7,13 +7,14 @@ const index15 = require("../temp/15");
 const index16 = require("../temp/16");
 const index17 = require("../temp/17");
 const index18 = require("../temp/18");
-const after57 = require("../temp/after57")
+const after57_2 = require("../temp/new-after-57")
 const alex = require("../temp/alex")
 
-async function sendUsersAfter57(ctx) {
+
+async function sendUsersAfter57_2(ctx) {
     const dayData = await getCommon.calcNowDate()
-    const newArrayIntensive = after57
-    await  callDb.getNumberIndex().then(result => {
+    const newArrayIntensive = after57_2
+    await  callDb.getNumberIndex_2().then(result => {
         const number = result.indexSent + 1
         // console.log(number)
             for (let i = 0; i < newArrayIntensive.length; i++) {
@@ -26,7 +27,7 @@ async function sendUsersAfter57(ctx) {
                             } else {
                                 try {
                                     if (i === newArrayIntensive.length - 1) {
-                                        await callDb.saveIndex57(number)
+                                        await callDb.saveIndex57_2(number)
                                     }
                                     switch (newArrayIntensive[i].numberMonth) {
                                         case 13 :
@@ -96,4 +97,4 @@ async function sendUsersAfter57(ctx) {
     }
     )
 }
-module.exports = sendUsersAfter57;
+module.exports = sendUsersAfter57_2;
