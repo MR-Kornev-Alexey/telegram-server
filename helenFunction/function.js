@@ -443,7 +443,7 @@ exports.sendUsersIntensiveTest = async (ctx) => {
     await ctx.reply(`Отправка закончена`)
 }
 
-
+//ssh root@80.78.245.91
 async function sendUsersIntensive2_0_14(ctx, newArrayIntensive, number, dayData ) {
     await callDb.saveIndex57(number)
     for (let i = 0; i < newArrayIntensive.length; i++) {
