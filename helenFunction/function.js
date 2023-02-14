@@ -596,7 +596,7 @@ async function sortingBabyAfter56week() {
 }
 
 async function convertUserIntensive() {
-    const oldArray = await callDb.findAll()
+    const oldArray = await callDb.findAllHomeworks()
     const newArray = oldArray.map(({
                                        dataValues: {
                                            real_name_telegram,
@@ -658,28 +658,31 @@ async function findHelenForSend(arraySend) {
 }
 
 async function createListBefore56 (newData) {
+    const noSending = [5749279828, 5210099858, 1321902346 , 1251040108,  542927509,  11770275]
     const dataBefore56 = []
     for (let i = 0; i < newData.length; i++) {
         const fullMonth = await calculateMonthsSinceBirth(newData[i].dataValues.birthday_telegram)
         const fullWeek = await calculateWeeksSinceBirth(newData[i].dataValues.birthday_telegram)
         // console.log("fullMonth ---", fullMonth)
         // console.log("fullWeek ---", fullWeek)
-        if (fullWeek <= 56) {
+        if (fullWeek <= 60) {
             const linkVideo = await calculateLinkForSending(fullWeek, arraySend)
-            // console.log("linkVideo ---", linkVideo)
-            dataBefore56.push({
-                numberMonth: fullMonth,
-                numberWeek: fullWeek,
-                indexVideo: linkVideo.index,
-                link: linkVideo.link,
-                indexWeek: linkVideo.id,
-                chatId: newData[i].dataValues.chatId,
-                name: newData[i].dataValues.real_name_telegram,
-                birthday: newData[i].dataValues.birthday_telegram,
-            })
+            const isElementFound = noSending.includes(newData[i].dataValues.chatId)
+            if(!isElementFound){
+                dataBefore56.push({
+                    numberMonth: fullMonth,
+                    numberWeek: fullWeek,
+                    indexVideo: linkVideo.index,
+                    link: linkVideo.link,
+                    indexWeek: linkVideo.id,
+                    chatId: newData[i].dataValues.chatId,
+                    name: newData[i].dataValues.real_name_telegram,
+                    birthday: newData[i].dataValues.birthday_telegram,
+                })
+            }
         }
     }
-    // console.log("dataBefore56 ---", dataBefore56)
+    console.log("dataBefore56 ---", dataBefore56)
     return dataBefore56
 }
 
@@ -706,7 +709,7 @@ async function createListOFSendingAfter56Week(newArray) {  //command is list57
     for (let i = 0; i < newArray.length; i++) {
         const fullMonth = await calculateMonthsSinceBirth(newArray[i].dataValues.birthday_telegram)
         const fullWeek = await calculateWeeksSinceBirth(newArray[i].dataValues.birthday_telegram)
-        if (fullWeek === 13 || fullWeek === 13 ) {
+        if (fullMonth === 13 || fullMonth === 13 ) {
             dataAfter57.push({
                 numberMonth: fullMonth,
                 numberWeek: fullWeek,

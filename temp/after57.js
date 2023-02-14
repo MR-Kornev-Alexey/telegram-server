@@ -140,6 +140,12 @@ module.exports = [
         birthday: '28-09-2021',
         link: ''
     },
+    {   numberMonth: 15,
+        numberWeek: 68,
+        name: 'Maxim Mateiko',
+        chatId: 964342357,
+        birthdayBaby: '28-09-2021',
+    },
     {
         numberMonth: 15,
         numberWeek: 69,

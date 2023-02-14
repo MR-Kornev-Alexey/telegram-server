@@ -143,8 +143,8 @@ exports.findAllIntensive2_0 = async (req, res) => {
 
 
 // Retrieve all Tutorials from the database.
-exports.findAll = async (req, res) => {
-    return await dataBot.Tutorial.findAll( { where: { source: 'intensive-1'}})
+exports.findAllHomeworks = async (req, res) => {
+    return await dataBot.Tutorial.findAll( { where: { source: 'intensive-max'}})
         .then(user => {
             // console.log(data)
             return user;
