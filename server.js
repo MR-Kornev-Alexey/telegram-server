@@ -72,9 +72,9 @@ const {getClose , getMainMenu, getMainMenuFirst, getService} = require('./lib/ke
 cron.schedule('0 6 * * 1-5', async () => {
     await sendUsersNew(helen)
 });
-// cron.schedule('30 6 * * 1-5', async () => {
-//     await sendAfter57_2(helen)
-// });
+cron.schedule('30 6 * * 1-5', async () => {
+    await sendAfter57_2(helen)
+});
 // cron.schedule('0 7 * * 1-5', async () => {
 //     await sendAfter57(helen)
 // });

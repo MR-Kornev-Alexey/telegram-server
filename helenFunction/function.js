@@ -665,7 +665,7 @@ async function createListBefore56 (newData) {
         const fullWeek = await calculateWeeksSinceBirth(newData[i].dataValues.birthday_telegram)
         // console.log("fullMonth ---", fullMonth)
         // console.log("fullWeek ---", fullWeek)
-        if (fullWeek <= 60) {
+        if (fullWeek <= 62) {
             const linkVideo = await calculateLinkForSending(fullWeek, arraySend)
             const isElementFound = noSending.includes(newData[i].dataValues.chatId)
             if(!isElementFound){
