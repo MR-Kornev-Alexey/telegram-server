@@ -24,7 +24,7 @@ help  - Подсказать
 /stern
 /sama
 
-
+nYEw-3Xv3mAq
 // Массив, хранящий статусы нажатия кнопок
 const buttonStatus = [];
 

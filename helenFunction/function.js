@@ -658,7 +658,7 @@ async function findHelenForSend(arraySend) {
 }
 
 async function createListBefore56 (newData) {
-    const noSending = [5749279828, 5210099858, 1321902346 , 1251040108,  542927509,  11770275]
+    const noSending = [5749279828, 5210099858, 1321902346 , 1251040108,  542927509,  11770275, 1430019107,  768625232, 1321902346, 145003601]
     const dataBefore56 = []
     for (let i = 0; i < newData.length; i++) {
         const fullMonth = await calculateMonthsSinceBirth(newData[i].dataValues.birthday_telegram)
@@ -709,7 +709,7 @@ async function createListOFSendingAfter56Week(newArray) {  //command is list57
     for (let i = 0; i < newArray.length; i++) {
         const fullMonth = await calculateMonthsSinceBirth(newArray[i].dataValues.birthday_telegram)
         const fullWeek = await calculateWeeksSinceBirth(newArray[i].dataValues.birthday_telegram)
-        if (fullMonth === 13 || fullMonth === 13 ) {
+        if (fullMonth === 13 || fullMonth === 14 ) {
             dataAfter57.push({
                 numberMonth: fullMonth,
                 numberWeek: fullWeek,
