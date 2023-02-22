@@ -58,8 +58,14 @@ class lookHomeworkSceneGenerator {
             const chatId = ctx.update.callback_query.from.id
             const messageId = ctx.update.callback_query.message.message_id
             ctx.answerCbQuery()
-            await ctx.telegram.deleteMessage(chatId, messageId)
-            await ctx.scene.leave()
+            if (chatId) {
+                try {
+                    await ctx.telegram.deleteMessage(chatId, messageId)
+                    await ctx.scene.leave()
+                }catch (e) {
+                    console.log(e)
+                }
+            } else {}
         });
         look.action(/(\d+)/, async ctx => {
             const newId = ctx.update.callback_query.data
@@ -102,7 +108,13 @@ class lookHomeworkSceneGenerator {
             const chatId = ctx.update.callback_query.from.id
             const messageId = ctx.update.callback_query.message.message_id
             ctx.answerCbQuery()
-            await ctx.telegram.deleteMessage(chatId, messageId)
+            if (chatId) {
+                try {
+                    await ctx.telegram.deleteMessage(chatId, messageId)
+                }catch (e) {
+                    console.log(e)
+                }
+            } else {}
         });
 
         async function calculateLinkForSending(fullWeek, number) {
@@ -152,16 +164,22 @@ class lookHomeworkSceneGenerator {
             const chatId = ctx.update.callback_query.from.id
             const link = await calcLink(chatId, 0 )
             ctx.answerCbQuery()
-            await ctx.reply(`Домашнее задание сегодня\n ${link}`,
-                {
-                    reply_markup: {
-                        inline_keyboard: [
-                            [
-                                { text: 'Закрыть', callback_data: 'close_video' }
-                            ]
-                        ]
-                    }
-                })
+            if (chatId) {
+                try {
+                    await ctx.reply(`Домашнее задание сегодня\n ${link}`,
+                        {
+                            reply_markup: {
+                                inline_keyboard: [
+                                    [
+                                        { text: 'Закрыть', callback_data: 'close_video' }
+                                    ]
+                                ]
+                            }
+                        })
+                }catch (e) {
+                    console.log(e)
+                }
+            } else {}
         });
 
         look.on('message', async (ctx) => {

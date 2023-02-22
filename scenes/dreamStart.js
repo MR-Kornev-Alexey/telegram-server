@@ -1,6 +1,7 @@
 const {Scenes: {BaseScene}} = require('telegraf');
 const callDb = require("../controllers/tutorial.controller")
 const {getMainMenuDream} = require("../lib/keyboards");
+const HelenFunction = require("../helenFunction/function");
 
 class dreamStartSceneGenerator {
 
@@ -32,7 +33,7 @@ class dreamStartSceneGenerator {
             if (!buttonStartPressed) {
                 buttonStartPressed = true;
                 try {
-                     await ctx.reply(webApp,
+                    await ctx.reply(webApp,
                         {
                             reply_markup: {
                                 inline_keyboard: [
@@ -52,39 +53,40 @@ class dreamStartSceneGenerator {
                 }
             }
         }
+
         let buttonStartBeginPressed = false;
         dream_begin.enter(
             async (ctx) => {
                 if (!buttonStartBeginPressed) {
                     buttonStartBeginPressed = true;
-                try {
-                    const user = ctx.scene.state.user;
-                    await callDb.getOneUser(user)
-                        .then(async (result) => {
-                            console.log(result)
-                            if (result.access_dream) {
-                                await startMainDreamMenu(ctx)
-                            } else {
-                                await ctx.telegram.sendMessage(result.chatId, 'У вас нет доступа к курсу по сну.\n' +
-                                    'Напишите в Службу поддержки\n https://t.me/mrk_service',
-                                    {
-                                        reply_markup: {
-                                            inline_keyboard: [
-                                                [{text: "📕 Закрыть", callback_data: 'close_dream_begin'}]
-                                            ]
+                    try {
+                        const user = ctx.scene.state.user;
+                        await callDb.getOneUser(user)
+                            .then(async (result) => {
+                                console.log(result)
+                                if (result.access_dream) {
+                                    await startMainDreamMenu(ctx)
+                                } else {
+                                    await ctx.telegram.sendMessage(result.chatId, 'У вас нет доступа к курсу по сну.\n' +
+                                        'Напишите в Службу поддержки\n https://t.me/mrk_service',
+                                        {
+                                            reply_markup: {
+                                                inline_keyboard: [
+                                                    [{text: "📕 Закрыть", callback_data: 'close_dream_begin'}]
+                                                ]
+                                            }
                                         }
-                                    }
-                                )
-                            }
-                        }).catch(e => {
-                                console.log(e)
-                            }
-                        )
-                } catch (e) {
-                    console.log(e)
-                } finally {
-                    buttonStartBeginPressed = false;
-                }
+                                    )
+                                }
+                            }).catch(e => {
+                                    console.log(e)
+                                }
+                            )
+                    } catch (e) {
+                        console.log(e)
+                    } finally {
+                        buttonStartBeginPressed = false;
+                    }
                 }
             })
 
@@ -92,16 +94,28 @@ class dreamStartSceneGenerator {
             const chatId = ctx.update.callback_query.from.id
             const messageId = ctx.update.callback_query.message.message_id
             ctx.answerCbQuery()
-            await ctx.telegram.deleteMessage(chatId, messageId)
-            await ctx.scene.leave()
+            if (chatId) {
+                try {
+                    await ctx.telegram.deleteMessage(chatId, messageId)
+                    await ctx.scene.leave()
+                } catch (e) {
+                    console.log(e)
+                }
+            }
         });
         dream_begin.action('start_data_dream', async ctx => {
             const chatId = ctx.update.callback_query.from.id
             const messageId = ctx.update.callback_query.message.message_id
             ctx.answerCbQuery()
-            await ctx.telegram.deleteMessage(chatId, messageId)
-            await ctx.scene.leave()
-            await ctx.scene.enter('dream_start')
+            if (chatId) {
+                try {
+                    await ctx.telegram.deleteMessage(chatId, messageId)
+                    await ctx.scene.leave()
+                    await ctx.scene.enter('dream_start')
+                } catch (e) {
+                    console.log(e)
+                }
+            }
         });
         return dream_begin
     }
@@ -336,14 +350,26 @@ class dreamStartSceneGenerator {
             const chatId = ctx.update.callback_query.from.id
             const messageId = ctx.update.callback_query.message.message_id
             ctx.answerCbQuery()
-            await ctx.telegram.deleteMessage(chatId, messageId)
-            await ctx.scene.leave()
+            if (chatId) {
+                try {
+                    await ctx.telegram.deleteMessage(chatId, messageId)
+                    await ctx.scene.leave()
+                }catch (e) {
+                    console.log(e)
+                }
+            } else {}
         });
         dream_start.action('close_frame', async ctx => {
             const chatId = ctx.update.callback_query.from.id
             const messageId = ctx.update.callback_query.message.message_id
             ctx.answerCbQuery()
-            await ctx.telegram.deleteMessage(chatId, messageId)
+            if (chatId) {
+                try {
+                    await ctx.telegram.deleteMessage(chatId, messageId)
+                }catch (e) {
+                    console.log(e)
+                }
+            } else {}
         });
 
         let buttonReturnFramePressed = false;

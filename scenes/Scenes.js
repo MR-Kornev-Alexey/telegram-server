@@ -401,8 +401,15 @@ GenBabyScene () {
                 const chatId = ctx.update.callback_query.from.id
                 const messageId = ctx.update.callback_query.message.message_id
                 await ctx.answerCbQuery()
-                await ctx.telegram.deleteMessage(chatId, messageId)
-                await ctx.scene.enter('edit_email')
+            if (chatId) {
+                try {
+                    await ctx.telegram.deleteMessage(chatId, messageId)
+                    await ctx.scene.enter('edit_email')
+                }catch (e) {
+                    console.log(e)
+                }
+            } else {}
+
             }
         )
         check.action('edit_location', async (ctx) => {
@@ -410,8 +417,15 @@ GenBabyScene () {
                 const chatId = ctx.update.callback_query.from.id
                 const messageId = ctx.update.callback_query.message.message_id
                 await ctx.answerCbQuery()
-                await ctx.telegram.deleteMessage(chatId, messageId)
-                await ctx.scene.enter('edit_location')
+            if (chatId) {
+                try {
+                    await ctx.telegram.deleteMessage(chatId, messageId)
+                    await ctx.scene.enter('edit_location')
+                }catch (e) {
+                    console.log(e)
+                }
+            } else {}
+
             }
         )
         check.action('edit_name', async (ctx) => {
@@ -419,8 +433,15 @@ GenBabyScene () {
                 const chatId = ctx.update.callback_query.from.id
                 const messageId = ctx.update.callback_query.message.message_id
                 await ctx.answerCbQuery()
-                await ctx.telegram.deleteMessage(chatId, messageId)
-                await ctx.scene.enter('edit_name')
+            if (chatId) {
+                try {
+                    await ctx.telegram.deleteMessage(chatId, messageId)
+                    await ctx.scene.enter('edit_name')
+                }catch (e) {
+                    console.log(e)
+                }
+            } else {}
+
             }
         )
 
@@ -429,8 +450,14 @@ GenBabyScene () {
                 const chatId = ctx.update.callback_query.from.id
                 const messageId = ctx.update.callback_query.message.message_id
                 await ctx.answerCbQuery()
-                await ctx.telegram.deleteMessage(chatId, messageId)
-                await ctx.scene.enter('edit_birthday')
+            if (chatId) {
+                try {
+                    await ctx.telegram.deleteMessage(chatId, messageId)
+                    await ctx.scene.enter('edit_birthday')
+                }catch (e) {
+                    console.log(e)
+                }
+            } else {}
             }
         )
         check.action('edit_baby', async (ctx) => {
@@ -438,18 +465,32 @@ GenBabyScene () {
             const chatId = ctx.update.callback_query.from.id
             const messageId = ctx.update.callback_query.message.message_id
             await ctx.answerCbQuery()
-            await ctx.telegram.deleteMessage(chatId, messageId)
-            await ctx.scene.enter('edit_baby')
+            if (chatId) {
+                try {
+                    await ctx.telegram.deleteMessage(chatId, messageId)
+                    await ctx.scene.enter('edit_baby')
+                }catch (e) {
+                    console.log(e)
+                }
+            } else {}
+
             }
         )
         check.action('yes', async ctx => {
             const chatId = ctx.update.callback_query.from.id
             const messageId = ctx.update.callback_query.message.message_id
             ctx.answerCbQuery()
-            await ctx.telegram.deleteMessage(chatId, messageId)
-            await ctx.scene.leave()
-            await getCommon.getServiceNew(ctx, chatId)
-            await getCommon.sendServiceNewUser(ctx, chatId)
+            if (chatId) {
+                try {
+                    await ctx.telegram.deleteMessage(chatId, messageId)
+                    await ctx.scene.leave()
+                    await getCommon.getServiceNew(ctx, chatId)
+                    await getCommon.sendServiceNewUser(ctx, chatId)
+                }catch (e) {
+                    console.log(e)
+                }
+            } else {}
+
         });
         return check
     }

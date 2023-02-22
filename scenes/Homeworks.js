@@ -59,15 +59,26 @@ class HomeworksGenerator {
             const chatId = ctx.update.callback_query.from.id
             const messageId = ctx.update.callback_query.message.message_id
             ctx.answerCbQuery()
-            await ctx.telegram.deleteMessage(chatId, messageId)
-            // await ctx.scene.leave()
+            if (chatId) {
+                try {
+                    await ctx.telegram.deleteMessage(chatId, messageId)
+                }catch (e) {
+                    console.log(e)
+                }
+            } else {}
         });
 
         start.action('close_video', async ctx => {
             const chatId = ctx.update.callback_query.from.id
             const messageId = ctx.update.callback_query.message.message_id
             ctx.answerCbQuery()
-            await ctx.telegram.deleteMessage(chatId, messageId)
+            if (chatId) {
+                try {
+                    await ctx.telegram.deleteMessage(chatId, messageId)
+                }catch (e) {
+                    console.log(e)
+                }
+            } else {}
         });
 
         start.action('start', ctx => {
@@ -100,12 +111,19 @@ class HomeworksGenerator {
             // const resultWatch = callDb.searchWatch({ newIndex,userId })
             if (lastFour === 'link') {
                 const userId = ctx.update.callback_query.from.id
-                const urlLink = await actionGetOneHomework(actionId)
-                // console.log("The urlLink id is:", urlLink);
-                const result = await callDb.searchWatch({userId,urlLink})
-                // console.log("result  --  ",result)
-                await ctx.telegram.sendMessage(userId, await finishSent(result,urlLink), await getWatch(result) ).then(r => {
-                })
+                if (chatId) {
+                    try {
+                        const urlLink = await actionGetOneHomework(actionId)
+                        // console.log("The urlLink id is:", urlLink);
+                        const result = await callDb.searchWatch({userId,urlLink})
+                        // console.log("result  --  ",result)
+                        await ctx.telegram.sendMessage(userId, await finishSent(result,urlLink), await getWatch(result) ).then(r => {
+                        })
+                    }catch (e) {
+                        console.log(e)
+                    }
+                } else {}
+
             } else {
                 homeworksList(ctx, newId).then(r => {
                 });

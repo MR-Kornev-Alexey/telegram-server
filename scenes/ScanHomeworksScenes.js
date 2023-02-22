@@ -63,14 +63,26 @@ class ScanHomeworkSceneGenerator {
             const chatId = ctx.update.callback_query.from.id
             const messageId = ctx.update.callback_query.message.message_id
             ctx.answerCbQuery()
-            await ctx.telegram.deleteMessage(chatId, messageId)
+            if (chatId) {
+                try {
+                    await ctx.telegram.deleteMessage(chatId, messageId)
+                }catch (e) {
+                    console.log(e)
+                }
+            } else {}
         });
         scan.action('close_step', async ctx => {
             const chatId = ctx.update.callback_query.from.id
             const messageId = ctx.update.callback_query.message.message_id
             ctx.answerCbQuery()
-            await ctx.telegram.deleteMessage(chatId, messageId)
-            await ctx.scene.leave()
+            if (chatId) {
+                try {
+                    await ctx.telegram.deleteMessage(chatId, messageId)
+                    await ctx.scene.leave()
+                }catch (e) {
+                    console.log(e)
+                }
+            } else {}
         });
         scan.action('next_step', async ctx => {
             ctx.answerCbQuery()
