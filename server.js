@@ -22,6 +22,7 @@ const getCommon = require('./common/commonFunction')
 const sendUsersNew = require('./common/SentUser');
 const sendAfter57 = require('./common/SentUserAfter57')
 const sendAfter57_2 = require('./common/SentUserAfter57_2')
+const setNewWeek = require('./common/SetNewWeek')
 const sendDreamBot = require('./common/SentAllUserDreamBot')
 const helen = new Telegraf(token_helen);
 
@@ -61,6 +62,11 @@ const ScanHomeworkSceneGenerator = require('./scenes/ScanHomeworksScenes')
 const scanHomeScene =  new ScanHomeworkSceneGenerator()
 const sendingHome = sendScene.GenHomeScene()
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+const webinarWebinarSceneGenerator = require('./scenes/LookWebinars')
+const webinarScene =  new webinarWebinarSceneGenerator()
+const lookWebinar= webinarScene.GenWebinarScene()
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 const startScene = homeScene.GenStartScene()
 const scanScene = scanHomeScene.GenScanScene()
 const callDb = require("./controllers/tutorial.controller")
@@ -69,16 +75,22 @@ const {getClose , getMainMenu, getMainMenuFirst, getService} = require('./lib/ke
 
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-cron.schedule('0 6 * * 1-5', async () => {
+cron.schedule('0 6 * * 1', async () => {
+    await setNewWeek(helen)
+});
+cron.schedule('15 6 * * 1-5', async () => {
     await sendUsersNew(helen)
 });
-cron.schedule('30 6 * * 1-5', async () => {
+cron.schedule('50 6 * * 1-5', async () => {
     await sendAfter57_2(helen)
 });
+// sendUsersNew(helen).then( r =>{})
+// setNewWeek(helen).then(r => {})
 // cron.schedule('0 7 * * 1-5', async () => {
 //     await sendAfter57(helen)
 // });
 
+// sendAfter57(helen).then(r => {})
 // cron.schedule('*/20 * * * *', () => {
 //     helen.telegram.sendMessage(1081994928, `Running task every 20 min`).then(r => {})
 // });
@@ -98,7 +110,7 @@ const store = createStore(dataReducer);
 const stage = new Scenes.Stage([ageScene,
     nameScene, babyScene, checkScene, emailScene,
     startScene, sendingHome, locationScene, babyEditScene,
-    ageEditScene, nameEditScene, emailEditScene, locationEditScene, scanScene, lookScene, dreamStartScene, dreamBeginScene])
+    ageEditScene, nameEditScene, emailEditScene, locationEditScene, scanScene, lookScene, dreamStartScene, dreamBeginScene, lookWebinar])
 bot.use(session())
 bot.use(stage.middleware())
 dream.use(session())
@@ -130,63 +142,114 @@ async function checkUser(data) {
 
 
 bot.start(async (ctx) => {
-    await checkUser(ctx.message.from).then(async (result) => {
-        if (result) {
-            await getCommon.getServiceNew(ctx, ctx.message.from.id)
-        } else {
-            await ctx.replyWithHTML(
-                `<b>Добрый день ${ctx.message.from.first_name ? ctx.message.from.first_name : 'незнакомец'}!</b>\nПриветстую Вас в Helen Bot.\n Для функциональной работы прошу Вас пройти регистрацию.`,
-                {
-                    reply_markup: {
-                        inline_keyboard: [
-                            [
-                                { text: 'Регистрация', callback_data: 'data_reg' }
+    try{
+        await checkUser(ctx.message.from).then(async (result) => {
+            if (result) {
+                await getCommon.getServiceNew(ctx, ctx.message.from.id)
+            } else {
+                await ctx.replyWithHTML(
+                    `<b>Добрый день ${ctx.message.from.first_name ? ctx.message.from.first_name : 'незнакомец'}!</b>\nПриветстую Вас в Helen Bot.\n Для функциональной работы прошу Вас пройти регистрацию.`,
+                    {
+                        reply_markup: {
+                            inline_keyboard: [
+                                [
+                                    { text: 'Регистрация', callback_data: 'data_reg' }
+                                ]
                             ]
-                        ]
+                        }
                     }
-                }
-            )
-        }
-    }).catch(e => {
+                )
+            }
+        }).catch(e => {
+            console.log(e)
+        })
+    }catch (e) {
         console.log(e)
-    })
-
+    }
 })
 bot.action('data_reg', async (ctx) => {
-    await ctx.scene.enter('baby');
+    try {
+        await ctx.scene.enter('baby');
+    }catch (e) {
+        console.log(e)
+    }
 });
+
 bot.action('close_service', async (ctx) => {
     const chatId = ctx.update.callback_query.from.id
-    const messageId = ctx.update.callback_query.message.message_id
     ctx.answerCbQuery()
-    await ctx.telegram.deleteMessage(chatId, messageId)
+    if (chatId) {
+        try {
+            const messageId = ctx.update.callback_query.message.message_id
+            await ctx.telegram.deleteMessage(chatId, messageId)
+        }catch (e) {
+            console.log(e)
+        }
+    } else {}
 });
 
 bot.action('homeworks_button', async (ctx) => {
     const user =  ctx.update.callback_query.from.id
     ctx.answerCbQuery()
     console.log(user)
-    await ctx.scene.enter('start', { user });
+    if (user) {
+        try {
+            await ctx.scene.enter('start', { user });
+        }catch (e) {
+            console.log(e)
+        }
+    } else {}
+});
+bot.action('webinar_button', async (ctx) => {
+    const user =  ctx.update.callback_query.from.id
+    ctx.answerCbQuery()
+    console.log(user)
+    if (user) {
+        try {
+            await ctx.scene.enter('webinar', { user });
+        }catch (e) {
+            console.log(e)
+        }
+    } else {}
 });
 bot.action('sending_button', async (ctx) => {
     const user =  ctx.update.callback_query.from.id
     ctx.answerCbQuery()
     console.log(user)
-    await ctx.scene.enter('scan', { user });
+    if (user) {
+        try {
+            await ctx.scene.enter('scan', { user });
+        }catch (e) {
+            console.log(e)
+        }
+    } else {}
 });
 bot.action('dream_button', async (ctx) => {
     const user =  ctx.update.callback_query.from.id
     ctx.answerCbQuery()
     console.log(user)
-    await ctx.scene.enter('dream_begin', { user });
+    if (user) {
+        try {
+            await ctx.scene.enter('dream_begin', { user });
+        }catch (e) {
+            console.log(e)
+        }
+    } else {}
 });
+
 bot.action('open_dream_new_user', async (ctx) => {
     const text =  ctx.update.callback_query.message.text
     ctx.answerCbQuery()
-    const startIndex = text.indexOf("id-") + 3;
-    const endIndex = text.indexOf("-id");
-    const id = text.substring(startIndex, endIndex);
-    await HelenFunction.openDreamNewUser(ctx, id)
+    if (text) {
+        try {
+            const startIndex = text.indexOf("id-") + 3;
+            const endIndex = text.indexOf("-id");
+            const id = text.substring(startIndex, endIndex);
+            await HelenFunction.openDreamNewUser(ctx, id)
+        }catch (e) {
+            console.log(e)
+        }
+    } else {}
 });
 
 

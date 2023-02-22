@@ -21,6 +21,7 @@ const DateConverter = require('../common/DateConverter');
 const sendFileBefore56 = require("../temp/03-02-2023-before56")
 const {actionGetOneHomework, finishSent, homeworksList} = require("../homeworks");
 const {getWatch} = require("../lib/keyboards");
+const firstCalculateWeeksSinceBirth = require("../common/firstCalculateWeeksSinceBirth");
 const convert = new DateConverter()
 
 
@@ -113,17 +114,13 @@ async function nextStep(ctx) {
             await ctx.replyWithHTML(`<b>Команда find</b>`)//поиск незарегестрированных в ДЗ
             await findHelenForSend(checkFile)
             break
-        case "/sending":
-            await ctx.replyWithHTML(`<b>Команда sending</b>`)
-            await transmitterHomeworks(ctx, arraySend)
+        case "/add":
+            await ctx.replyWithHTML(`<b>Команда add</b>`)
+            await addWebinarForIntensive( ctx )
             break
         case "/list":
             await ctx.replyWithHTML(`<b>Команда list</b>`) //создание листа для рассылки
             await createList(ctx, arraySend)
-            break
-        case "/test20":
-            await ctx.replyWithHTML(`<b>Команда test20</b>`) //создание тестового листа для рассылки
-            await createListOFSending (ctx, arraySend)
             break
         case "/message":
             await ctx.replyWithHTML(`<b>Команда message</b>`)
@@ -306,7 +303,7 @@ async function gatDataForSend(arraySend) {
     const data = []
     for (let i = 0; i < newData.length; i++) {
         const fullMonth = await calculateMonthsSinceBirth(newData[i].dataValues.birthday_telegram)
-        const fullWeek = await calculateWeeksSinceBirth(newData[i].dataValues.birthday_telegram)
+        const fullWeek = await firstCalculateWeeksSinceBirth(newData[i].dataValues.birthday_telegram)
         if (fullWeek <= 56) {
             const linkVideo = await calculateLinkForSending(fullWeek, arraySend)
             data.push({
@@ -325,20 +322,6 @@ async function gatDataForSend(arraySend) {
     console.log(data)
     // return data
 }
-
-async function transmitterMessageNew(ctx, arraySend, message) {
-    const newArrayIntensive = await gatDataForSend(arraySend);
-    const data = newArrayIntensive.filter(user => user.status !== 'left' && user.status !== 'kicked' && user.status !== 'restricted');
-    const promises = data.map(async user => {
-        return ctx.telegram.sendMessage(user.chatId,
-            `Доброго времени суток ${user.name}\n ` +
-            `Вашему ребенку ${user.numberMonth} мес.?\n + ${message}`
-        )
-    });
-    await Promise.all(promises);
-    await ctx.replyWithHTML(`<b>${ctx.message.from.first_name ? ctx.message.from.first_name : 'незнакомец'}!</b>\n Сообщениe успешно отправлено`);
-}
-
 
 async function checkUsersForReal(ctx, arraySend) {
     let allErrors = []
@@ -662,10 +645,10 @@ async function createListBefore56 (newData) {
     const dataBefore56 = []
     for (let i = 0; i < newData.length; i++) {
         const fullMonth = await calculateMonthsSinceBirth(newData[i].dataValues.birthday_telegram)
-        const fullWeek = await calculateWeeksSinceBirth(newData[i].dataValues.birthday_telegram)
+        const fullWeek = await newData[i].dataValues.index_week
         // console.log("fullMonth ---", fullMonth)
         // console.log("fullWeek ---", fullWeek)
-        if (fullWeek <= 62) {
+        if (fullWeek <= 63) {
             const linkVideo = await calculateLinkForSending(fullWeek, arraySend)
             const isElementFound = noSending.includes(newData[i].dataValues.chatId)
             if(!isElementFound){
@@ -684,6 +667,15 @@ async function createListBefore56 (newData) {
     }
     console.log("dataBefore56 ---", dataBefore56)
     return dataBefore56
+}
+
+async function addWebinarForIntensive (stx) {
+    const newData = await callDb.findAllIntensive()
+    // console.log(newData)
+    for (let i = 0; i < newData.length; i++) {
+        const chatId = newData[i].dataValues.chatId
+        await callDb.saveWebinar(chatId, '[0,0,0,0,0,0,0,0,0,0]')
+    }
 }
 
 async function createList () {

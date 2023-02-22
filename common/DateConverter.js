@@ -3,8 +3,8 @@ class DateConverter {
         const birthdate = this.convertBirthdate(date);
         const today = new Date()
         const oneDay = 24 * 60 * 60 * 1000;
-        let diffDays = Math.round(Math.abs((birthdate.getTime() - today.getTime()) / (oneDay)));
-        return Math.round(diffDays / 7);
+        let diffDays = Math.floor(Math.abs((birthdate.getTime() - today.getTime()) / (oneDay)));
+        return Math.floor(diffDays / 7);
     }
     calculateMonthsSinceBirth = async (birthdate) => {
         const newBirthdate = this.convertBirthdate(birthdate);

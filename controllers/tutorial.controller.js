@@ -141,10 +141,9 @@ exports.findAllIntensive2_0 = async (req, res) => {
         });
 };
 
-
 // Retrieve all Tutorials from the database.
 exports.findAllHomeworks = async (req, res) => {
-    return await dataBot.Tutorial.findAll( { where: { source: 'intensive-max'}})
+    return await dataBot.Tutorial.findAll( { where: { source: '3months'}})
         .then(user => {
             // console.log(data)
             return user;
@@ -235,6 +234,13 @@ exports.saveDreamNew = async (id) => {
         where: { chatId: id }
     })
 }
+
+exports.saveWebinar = async (id, data) => {
+    dataBot.Tutorial.update({ choice_webinar: data}, {
+        where: { chatId: id }
+    })
+}
+
 exports.inputTrue = async (id) => {
     dataBot.Tutorial.update({ assess_homeworks: true }, {
         where: { chatId: id }
@@ -314,6 +320,13 @@ exports.getInDB = async (id, index) => {
                 reject(456);
             });
     });
+}
+
+exports.updateNewWeek = (id, week) => {
+    console.log(id, week);
+    dataBot.Intensive.update({ index_week: week}, {
+        where: { chatId: id }
+    })
 }
 
 exports.updateUser = (id,data) => {

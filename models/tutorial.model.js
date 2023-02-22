@@ -50,6 +50,14 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.BOOLEAN,
             defaultValue: false
         },
+        access_webinars: {
+            type: Sequelize.BOOLEAN,
+            defaultValue: false
+        },
+        choice_webinar: {
+            type: Sequelize.STRING,
+            defaultValue: '[0,0,0,0,0,0,0,0,0,0]'
+        },
         access_all: {
             type: Sequelize.BOOLEAN,
             defaultValue: false
@@ -152,6 +160,10 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.STRING,
             defaultValue: 'not-data'
         },
+        index_week:
+            {type: Sequelize.INTEGER,
+                defaultValue: 3
+            },
         pay_telegram:
             {type: Sequelize.INTEGER,
                 defaultValue: 0
