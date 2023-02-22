@@ -111,7 +111,7 @@ class HomeworksGenerator {
             // const resultWatch = callDb.searchWatch({ newIndex,userId })
             if (lastFour === 'link') {
                 const userId = ctx.update.callback_query.from.id
-                if (chatId) {
+                if (userId) {
                     try {
                         const urlLink = await actionGetOneHomework(actionId)
                         // console.log("The urlLink id is:", urlLink);
