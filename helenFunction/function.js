@@ -107,8 +107,9 @@ async function nextStep(ctx) {
             // await lookForSent(ctx)
             await ctx.scene.enter('look');
             break
-        case "/all":
-            await ctx.replyWithHTML(`<b>Команда all</b>`)
+        case "/delete":
+            await ctx.replyWithHTML(`<b>Команда Delete</b>`)
+            await callDb.deleteAfter7Days()
             break
         case "/find":
             await ctx.replyWithHTML(`<b>Команда find</b>`)//поиск незарегестрированных в ДЗ

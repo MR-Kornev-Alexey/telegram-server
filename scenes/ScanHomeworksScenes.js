@@ -102,14 +102,13 @@ class ScanHomeworkSceneGenerator {
             return arraySend[object - number]
         }
 
-
-
         async function calcLink(chatId, number) {
             // console.log(chatId)
             const user = await callDb.checkUserForCommon(chatId)
-            const fullWeek = await convert.calculateWeeksSinceBirth(user.birthday_telegram)
+            console.log(user)
+            const fullWeek = user.index_week
             const fullMonth = await convert.calculateMonthsSinceBirth(user.birthday_telegram)
-            if (fullWeek <= 56) {
+            if (fullWeek <= 63) {
                 const linkVideo = await calculateLinkForSending(fullWeek, number)
                 return linkVideo.link
                 }
@@ -135,18 +134,20 @@ class ScanHomeworkSceneGenerator {
 
         scan.action('check_today', async ctx => {
             const chatId = ctx.update.callback_query.from.id
-            const link = await calcLink(chatId, 0 )
             ctx.answerCbQuery()
-            await ctx.reply(`Домашнее задание сегодня\n ${link}`,
-                {
-                    reply_markup: {
-                        inline_keyboard: [
-                            [
-                                { text: 'Закрыть', callback_data: 'close_video' }
+            if(chatId){
+                const link = await calcLink(chatId, 0 )
+                await ctx.reply(`Домашнее задание сегодня\n ${link}`,
+                    {
+                        reply_markup: {
+                            inline_keyboard: [
+                                [
+                                    { text: 'Закрыть', callback_data: 'close_video' }
+                                ]
                             ]
-                        ]
-                    }
-                })
+                        }
+                    })
+            } else {}
         });
 
         scan.action('check_minus_1', async ctx => {

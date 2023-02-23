@@ -3,6 +3,24 @@ const {regexpToText} = require("nodemon/lib/utils");
 const dataBot = db.tutorials;
 const Op = db.Sequelize.Op;
 
+
+// const { Op } = require('sequelize');
+
+
+const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+exports.deleteAfter7Days = async () => {
+    await dataBot.HomeworksMark.destroy({
+        where: {
+            createdAt: {
+                [Op.lt]: sevenDaysAgo
+            }
+        }
+    });
+}
+
+
+
 // Create and Save a new Tutorial
 exports.createHelen = (data) => {
     // console.log('data_in_create =  ' +  data)
@@ -41,7 +59,7 @@ exports.checkUserForIntensive= async (id) => {
     return !!user;
 }
 exports.checkUserForCommon = async (id) => {
-    const user = await dataBot.Tutorial.findByPk(id);
+    const user = await dataBot.Intensive.findByPk(id);
     return user.dataValues;
 }
 exports.createUserForIntensive = async (data) => {
