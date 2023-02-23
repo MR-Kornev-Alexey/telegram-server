@@ -12,7 +12,7 @@ class webinarWebinarSceneGenerator {
             {label: '9-10', link: 'https://youtube.com/live/fcCZJqyd0Do'},
             {label: '11-13', link: 'https://youtube.com/live/v8bZ4jR2DN4'},
             {label: '14-18', link: 'https://youtube.com/live/ShMNQarl-MM'},
-            {label: '19-14', link: 'https://youtube.com/live/ShMNQarl-MM'},
+            {label: '19-14', link: 'https://youtube.com/live/a6eOOzjBYA0'},
             {
                 label: '25-30',
                 link: 'Для открытия обратитесь, пожалуйста, в Службу поддержки\n https://t.me/mrk_service'
@@ -55,9 +55,9 @@ class webinarWebinarSceneGenerator {
             // console.log(user)
 
         }
-
         async function checkOpenWebinar(array) {
             // создаем новый массив, содержащий позиции единиц
+            console.log('array - ', array);
             const newStr = array.replace(/\[|\]/g, "");
             const arr = newStr.split(",").map(Number);
             console.log(arr);
@@ -78,7 +78,7 @@ class webinarWebinarSceneGenerator {
 
         webinar.enter(async (ctx) => {
                 const user = ctx.update.callback_query.from.id
-                const listOfWebinar = await callDb.checkUserForCommon(user)
+                const listOfWebinar = await callDb.checkUserWebinar(user)
                 const openPositions = await checkOpenWebinar(listOfWebinar.choice_webinar)
                 console.log(openPositions)
                 try {

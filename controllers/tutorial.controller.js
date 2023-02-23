@@ -62,6 +62,10 @@ exports.checkUserForCommon = async (id) => {
     const user = await dataBot.Intensive.findByPk(id);
     return user.dataValues;
 }
+exports.checkUserWebinar = async (id) => {
+    const user = await dataBot.Tutorial.findByPk(id);
+    return user.dataValues;
+}
 exports.createUserForIntensive = async (data) => {
     const newUser = {
         email_telegram: data.email,
