@@ -62,7 +62,23 @@ exports.checkUserForCommon = async (id) => {
     const user = await dataBot.Intensive.findByPk(id);
     return user.dataValues;
 }
+exports.checkUserEmo = async (id) => {
+    let user = await dataBot.EmoCourse.findByPk(id);
+    if (!user) {
+        const newUser = {
+            registrationDate: new Date(),
+            lastOptionOpenDate: new Date(),
+            chatId: id
+        };
+        user = await dataBot.EmoCourse.create(newUser);
+    }
+    return user.dataValues;
+};
 exports.checkUserWebinar = async (id) => {
+    const user = await dataBot.Tutorial.findByPk(id);
+    return user.dataValues;
+}
+exports.checkUserMain = async (id) => {
     const user = await dataBot.Tutorial.findByPk(id);
     return user.dataValues;
 }

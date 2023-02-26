@@ -55,9 +55,10 @@ class webinarWebinarSceneGenerator {
             // console.log(user)
 
         }
+
         async function checkOpenWebinar(array) {
             // создаем новый массив, содержащий позиции единиц
-            console.log('array - ', array);
+            // console.log('array - ', array);
             const newStr = array.replace(/\[|\]/g, "");
             const arr = newStr.split(",").map(Number);
             console.log(arr);
@@ -78,29 +79,32 @@ class webinarWebinarSceneGenerator {
 
         webinar.enter(async (ctx) => {
                 const user = ctx.update.callback_query.from.id
-                const listOfWebinar = await callDb.checkUserWebinar(user)
-                const openPositions = await checkOpenWebinar(listOfWebinar.choice_webinar)
-                console.log(openPositions)
-                try {
-                    if (openPositions === null) {
-                        await ctx.reply(`У вас нет доступа ни к одному вебинару по развитию.\n Для открытия обратитесь, пожалуйста, в Службу поддержки\n https://t.me/mrk_service`,
-                            {
-                                reply_markup: {
-                                    inline_keyboard: [
-                                        [
-                                            {text: `Выйти`, callback_data: 'close_webinar'}
+                if (user) {
+                    const listOfWebinar = await callDb.checkUserWebinar(user)
+                    const openPositions = await checkOpenWebinar(listOfWebinar.choice_webinar)
+                    console.log(openPositions)
+                    try {
+                        if (openPositions === null) {
+                            await ctx.reply(`У вас нет доступа ни к одному вебинару по развитию.\n Для открытия обратитесь, пожалуйста, в Службу поддержки\n https://t.me/mrk_service`,
+                                {
+                                    reply_markup: {
+                                        inline_keyboard: [
+                                            [
+                                                {text: `Выйти`, callback_data: 'close_webinar'}
+                                            ]
                                         ]
-                                    ]
-                                }
-                            })
-                    } else {
-                        await ctx.reply(`Просмотр вебинаров по развитию.\n Выберите, пожалуйста, период`,
-                            await getWebinar(openPositions)
-                        )
-                    }
+                                    }
+                                })
+                        } else {
+                            await ctx.reply(`Просмотр вебинаров по развитию.\n Выберите, пожалуйста, период`,
+                                await getWebinar(openPositions)
+                            )
+                        }
 
-                } catch (e) {
-                    console.log(e)
+                    } catch (e) {
+                        console.log(e)
+                    }
+                } else {
                 }
 
             }
@@ -114,7 +118,7 @@ class webinarWebinarSceneGenerator {
                     const messageId = ctx.update.callback_query.message.message_id
                     ctx.answerCbQuery()
                     await ctx.telegram.deleteMessage(chatId, messageId)
-                 } catch (e) {
+                } catch (e) {
                     console.log(e)
                 }
             } else {
@@ -142,11 +146,6 @@ class webinarWebinarSceneGenerator {
         webinar.action(/(\d+)/, async (ctx) => {
             const newId = ctx.update.callback_query.data
             console.log("The newId is:", newId)
-            // const user = ctx.update.callback_query.from.id
-            //     ^
-            //
-            //     TypeError: Cannot read properties of undefined (reading 'from')
-
             ctx.answerCbQuery()
             if (ctx.update.callback_query.data === 'undefined' || ctx.update.callback_query.data === null) {
                 console.log("The ctx is:", newId)

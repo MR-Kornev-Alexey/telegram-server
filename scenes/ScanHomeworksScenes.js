@@ -88,15 +88,21 @@ class ScanHomeworkSceneGenerator {
             ctx.answerCbQuery()
             await ctx.reply('Эта функция пока в процессе разработки.')
         });
-        async function calculateLinkForSending(fullWeek, number) {
+        async function calculateLink(fullWeek) {
             const today = new Date();
             const dayOfWeek = today.getUTCDay();
+            // console.log("dayOfWeek ----- ", dayOfWeek )
             let indexLink = null
-            if (fullWeek <= 9) {
-                indexLink = "0" + fullWeek + "-0" + dayOfWeek
-            } else {
-                indexLink = fullWeek + "-0" + dayOfWeek
+            if (dayOfWeek === 0 || dayOfWeek === 6) {
+                indexLink = (fullWeek <= 9 ? "0" + fullWeek : fullWeek) + "-05";
+            } else if (dayOfWeek <= 5) {
+                indexLink = (fullWeek <= 9 ? "0" + fullWeek : fullWeek) + "-0" + dayOfWeek;
             }
+            // console.log("indexLink --- ", indexLink)
+            return indexLink
+        }
+        async function calculateLinkForSending(fullWeek, number) {
+            const indexLink = await calculateLink(fullWeek)
             let object = arraySend.findIndex(obj => obj.id === indexLink)
             // console.log('object ----', arraySend[object - number])
             return arraySend[object - number]
@@ -105,31 +111,36 @@ class ScanHomeworkSceneGenerator {
         async function calcLink(chatId, number) {
             // console.log(chatId)
             const user = await callDb.checkUserForCommon(chatId)
-            console.log(user)
+            console.log('user --- ', user)
             const fullWeek = user.index_week
             const fullMonth = await convert.calculateMonthsSinceBirth(user.birthday_telegram)
-            if (fullWeek <= 63) {
-                const linkVideo = await calculateLinkForSending(fullWeek, number)
-                return linkVideo.link
+            try{
+                if (fullWeek <= 63) {
+                    const linkVideo = await calculateLinkForSending(fullWeek, number)
+                    return linkVideo.link
                 }
-            else {
-                const indexArrays = {
-                    13: index13,
-                    14: index14,
-                    15: index15,
-                    16: index16,
-                    17: index17,
-                    18: index18
+                else {
+                    const indexArrays = {
+                        13: index13,
+                        14: index14,
+                        15: index15,
+                        16: index16,
+                        17: index17,
+                        18: index18
+                    }
+                    const numberToday = await callDb.getNumber()
+                    const indexHW = numberToday.dataValues.indexSent - number
+                    console.log(numberToday.dataValues.indexSent)
+                    if (indexArrays[fullMonth]) {
+                        return indexArrays[fullMonth][indexHW].link
+                    } else {
+                        return 'Эта функция пока в процессе разработки.'
+                    }
                 }
-                const numberToday = await callDb.getNumber()
-                const indexHW = numberToday.dataValues.indexSent - number
-                console.log(numberToday.dataValues.indexSent)
-                if (indexArrays[fullMonth]) {
-                    return indexArrays[fullMonth][indexHW].link
-                } else {
-                    return 'Эта функция пока в процессе разработки.'
-                }
+            } catch (e) {
+                console.log(e)
             }
+
         }
 
         scan.action('check_today', async ctx => {
@@ -152,78 +163,88 @@ class ScanHomeworkSceneGenerator {
 
         scan.action('check_minus_1', async ctx => {
             const chatId = ctx.update.callback_query.from.id
-            const link = await calcLink(chatId, 1 )
             ctx.answerCbQuery()
-            await ctx.reply(`Домашнее задание минус 1\n ${link}`,
-                {
-                    reply_markup: {
-                        inline_keyboard: [
-                            [
-                                { text: 'Закрыть', callback_data: 'close_video' }
+            if(chatId) {
+                const link = await calcLink(chatId, 1 )
+                await ctx.reply(`Домашнее задание минус 1\n ${link}`,
+                    {
+                        reply_markup: {
+                            inline_keyboard: [
+                                [
+                                    { text: 'Закрыть', callback_data: 'close_video' }
+                                ]
                             ]
-                        ]
-                    }
-                })
+                        }
+                    })
+            } else {}
         });
         scan.action('check_minus_2', async ctx => {
             const chatId = ctx.update.callback_query.from.id
-            const link = await calcLink(chatId, 2 )
             ctx.answerCbQuery()
-            await ctx.reply(`Домашнее задание минус 2\n ${link}`,
-                {
-                    reply_markup: {
-                        inline_keyboard: [
-                            [
-                                { text: 'Закрыть', callback_data: 'close_video' }
+            if(chatId) {
+                const link = await calcLink(chatId, 2 )
+                await ctx.reply(`Домашнее задание минус 2\n ${link}`,
+                    {
+                        reply_markup: {
+                            inline_keyboard: [
+                                [
+                                    { text: 'Закрыть', callback_data: 'close_video' }
+                                ]
                             ]
-                        ]
-                    }
-                })
+                        }
+                    })
+            } else {}
         });
         scan.action('check_minus_3', async ctx => {
             const chatId = ctx.update.callback_query.from.id
-            const link = await calcLink(chatId, 3 )
             ctx.answerCbQuery()
-            await ctx.reply(`Домашнее задание минус 3\n ${link}`,
-                {
-                    reply_markup: {
-                        inline_keyboard: [
-                            [
-                                { text: 'Закрыть', callback_data: 'close_video' }
+            if(chatId) {
+                const link = await calcLink(chatId, 3 )
+                await ctx.reply(`Домашнее задание минус 3\n ${link}`,
+                    {
+                        reply_markup: {
+                            inline_keyboard: [
+                                [
+                                    { text: 'Закрыть', callback_data: 'close_video' }
+                                ]
                             ]
-                        ]
-                    }
-                })
+                        }
+                    })
+            } else {}
         });
         scan.action('check_minus_4', async ctx => {
-            const chatId = ctx.update.callback_query.from.id
-            const link = await calcLink(chatId, 4 )
+           const chatId = ctx.update.callback_query.from.id
             ctx.answerCbQuery()
-            await ctx.reply(`Домашнее задание минус 4\n  ${link}`,
-                {
-                    reply_markup: {
-                        inline_keyboard: [
-                            [
-                                { text: 'Закрыть', callback_data: 'close_video' }
+            if(chatId) {
+                const link = await calcLink(chatId, 4 )
+                await ctx.reply(`Домашнее задание минус 4\n  ${link}`,
+                    {
+                        reply_markup: {
+                            inline_keyboard: [
+                                [
+                                    { text: 'Закрыть', callback_data: 'close_video' }
+                                ]
                             ]
-                        ]
-                    }
-                })
+                        }
+                    })
+            } else {}
         });
         scan.action('check_minus_5', async ctx => {
             const chatId = ctx.update.callback_query.from.id
-            const link = await calcLink(chatId, 5 )
             ctx.answerCbQuery()
-            await ctx.reply(`Домашнее задание минус 5\n ${link}`,
-                {
-                    reply_markup: {
-                        inline_keyboard: [
-                            [
-                                { text: 'Закрыть', callback_data: 'close_video' }
+            if(chatId) {
+                const link = await calcLink(chatId, 5 )
+                await ctx.reply(`Домашнее задание минус 5\n ${link}`,
+                    {
+                        reply_markup: {
+                            inline_keyboard: [
+                                [
+                                    { text: 'Закрыть', callback_data: 'close_video' }
+                                ]
                             ]
-                        ]
-                    }
-                })
+                        }
+                    })
+            } else {}
         });
 
         scan.on('message', async (ctx) => {

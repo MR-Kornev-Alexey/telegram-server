@@ -74,6 +74,10 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.BOOLEAN,
             defaultValue: false
         },
+        choice_emo: {
+            type: Sequelize.STRING,
+            defaultValue: '[0,0,0,0,0,0]'
+        },
         access_speak: {
             type: Sequelize.BOOLEAN,
             defaultValue: false
@@ -87,6 +91,25 @@ module.exports = (sequelize, Sequelize) => {
             defaultValue: 'no'
         }
 
+    });
+    const EmoCourse = sequelize.define('emoCourse', {
+        chatId: {
+            type: Sequelize.BIGINT,
+            primaryKey: true,
+            autoIncrement: true,
+        },
+        choice_emo: {
+            type: Sequelize.STRING,
+            defaultValue: '[1,0,0,0,0,0]'
+        },
+        registrationDate: {
+            type: Sequelize.DATE,
+            allowNull: true
+        },
+        lastOptionOpenDate: {
+            type: Sequelize.DATE,
+            allowNull: true
+        }
     });
     const HomeworksWatch = sequelize.define('homeworksWatch', {
         userId: {
@@ -284,5 +307,5 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.INTEGER,
         }
     });
-    return { Tutorial, HomeworksMark, Intensive, SendBlocked, Helen, Sending, IndexOfSend57, Test};
+    return { Tutorial, HomeworksMark, Intensive, SendBlocked, Helen, Sending, IndexOfSend57, Test, EmoCourse};
 };

@@ -12,7 +12,7 @@ const HelenFunction = require('./helenFunction/function')
 const token_dream = "5858592661:AAGdzbUERIMeXsAANjKkONyCZDk56TDnON0"// dream bot
 const token_dev = "5739415913:AAG0e8F6BtVEFHusoIRix8wvkKN23RZpcsc" // main bot
 const token_super = "5810660881:AAEtp2JduLoeBpiHBXDCfJKKbSWw3fiArVU" // superHelen bot
-const bot = new Telegraf(token_dev);
+const bot = new Telegraf(token_super);
 const dream = new Telegraf(token_dream);
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 const token_helen = "5815175979:AAGXqlzqxeq9LCigysbmxrqmhVrsD76LGos" //helen_bot
@@ -53,6 +53,9 @@ const dreamScene = new dreamStartSceneGenerator()
 const dreamStartScene = dreamScene.GenDreamStartScene()
 const dreamBeginScene = dreamScene.GenDreamBeginScene()
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+const EmoSceneGenerator = require('./scenes/EmoCourse')
+const EmoSceneCommon = new EmoSceneGenerator()
+const emoScene = EmoSceneCommon.GenEmoScene()
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 const LookHomeworkSceneGenerator = require('./scenes/LookHomeworks')
 const lookSceneCommon = new LookHomeworkSceneGenerator()
@@ -110,7 +113,7 @@ const store = createStore(dataReducer);
 const stage = new Scenes.Stage([ageScene,
     nameScene, babyScene, checkScene, emailScene,
     startScene, sendingHome, locationScene, babyEditScene,
-    ageEditScene, nameEditScene, emailEditScene, locationEditScene, scanScene, lookScene, dreamStartScene, dreamBeginScene, lookWebinar])
+    ageEditScene, nameEditScene, emailEditScene, locationEditScene, scanScene, lookScene, dreamStartScene, dreamBeginScene, lookWebinar, emoScene])
 bot.use(session())
 bot.use(stage.middleware())
 dream.use(session())
@@ -207,6 +210,18 @@ bot.action('webinar_button', async (ctx) => {
     if (user) {
         try {
             await ctx.scene.enter('webinar', { user });
+        }catch (e) {
+            console.log(e)
+        }
+    } else {}
+});
+bot.action('emo_button', async (ctx) => {
+    const user =  ctx.update.callback_query.from.id
+    ctx.answerCbQuery()
+    console.log(user)
+    if (user) {
+        try {
+            await ctx.scene.enter('emo', { user });
         }catch (e) {
             console.log(e)
         }
