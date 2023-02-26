@@ -12,7 +12,7 @@ const HelenFunction = require('./helenFunction/function')
 const token_dream = "5858592661:AAGdzbUERIMeXsAANjKkONyCZDk56TDnON0"// dream bot
 const token_dev = "5739415913:AAG0e8F6BtVEFHusoIRix8wvkKN23RZpcsc" // main bot
 const token_super = "5810660881:AAEtp2JduLoeBpiHBXDCfJKKbSWw3fiArVU" // superHelen bot
-const bot = new Telegraf(token_super);
+const bot = new Telegraf(token_dev);
 const dream = new Telegraf(token_dream);
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 const token_helen = "5815175979:AAGXqlzqxeq9LCigysbmxrqmhVrsD76LGos" //helen_bot
