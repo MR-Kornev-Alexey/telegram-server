@@ -649,7 +649,7 @@ async function createListBefore56 (newData) {
         const fullWeek = await newData[i].dataValues.index_week
         // console.log("fullMonth ---", fullMonth)
         // console.log("fullWeek ---", fullWeek)
-        if (fullWeek <= 63) {
+        if (fullWeek <= 78) {
             const linkVideo = await calculateLinkForSending(fullWeek, arraySend)
             const isElementFound = noSending.includes(newData[i].dataValues.chatId)
             if(!isElementFound){
