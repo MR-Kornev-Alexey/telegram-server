@@ -362,9 +362,13 @@ const publicAll = path.join(__dirname, './public');
 const publicRouter = express.Router();
 const adminRouter = express.Router();
 
-publicRouter.get('/', function(req, res) {
+publicRouter.get('*', function(req, res) {
     res.sendFile(path.join(publicAll, 'index.html'));
 });
+// поменял / на  *
+// app.get('*', function(req, res) {
+//     res.sendFile(path.join(__dirname, 'dist', 'index.html'))
+// })
 
 adminRouter.use((req, res, next) => {
     if (!req.user) {
