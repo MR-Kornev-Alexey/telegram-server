@@ -640,7 +640,6 @@ async function findHelenForSend(arraySend) {
     }
     console.log("noFind ---", noFind)
 }
-
 async function createListBefore56 (newData) {
     const noSending = [5749279828, 5210099858, 1321902346 , 1251040108,  542927509,  11770275, 1430019107,  768625232, 1321902346, 145003601]
     const dataBefore56 = []
