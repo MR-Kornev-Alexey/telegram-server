@@ -24,6 +24,7 @@ help  - Подсказать
 /stern
 /sama
 
+ssh root@80.78.245.91  
 nYEw-3Xv3mAq
 // Массив, хранящий статусы нажатия кнопок
 const buttonStatus = [];
