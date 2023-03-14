@@ -259,8 +259,9 @@ bot.action('open_dream_new_user', async (ctx) => {
         try {
             const startIndex = text.indexOf("id-") + 3;
             const endIndex = text.indexOf("-id");
-            const id = text.substring(startIndex, endIndex);
-            await HelenFunction.openDreamNewUser(ctx, id)
+            const chatId = text.substring(startIndex, endIndex);
+            await HelenFunction.openDreamNewUser(ctx, chatId)
+            await ctx.telegram.sendMessage(chatId, `Вам доступ открыт.\n Перегрузите, пожалуйста БОТ командой \/start`)
         }catch (e) {
             console.log(e)
         }

@@ -267,20 +267,23 @@ exports.recordLink = async (chatId, videoId , linkID) => {
     }
 }
 
+exports.changeIndexOfWeek= async (id, week)=> {
+    console.log(id , week)
+}
 exports.saveDreamNew = async (id) => {
-    dataBot.Tutorial.update({ access_all: true, access_dream: true }, {
+    await dataBot.Tutorial.update({ access_all: true, access_dream: true }, {
         where: { chatId: id }
     })
 }
 
 exports.saveWebinar = async (id, data) => {
-    dataBot.Tutorial.update({ choice_webinar: data}, {
+    await dataBot.Tutorial.update({ choice_webinar: data}, {
         where: { chatId: id }
     })
 }
 
 exports.inputTrue = async (id) => {
-    dataBot.Tutorial.update({ assess_homeworks: true }, {
+    await dataBot.Tutorial.update({ assess_homeworks: true }, {
         where: { chatId: id }
     })
 

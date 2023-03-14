@@ -38,7 +38,7 @@ const convert = new DateConverter()
 exports.openDreamNewUser = async (ctx, user) => {
     await callDb.saveDreamNew(user).then(
         await ctx.reply(
-            `Доступ открыт`
+            `Доступ к Боту по сну открыт`
         )
     ).catch(e => {
         console.log(e)

@@ -68,33 +68,33 @@ exports.sendServiceNewUser = async (ctx, dataUser) => {
     const user = await callDb.getOneUser(dataUser)
     console.log(user)
     try {
-
         await ctx.telegram.sendMessage(1081994928, `Новая регистрация или изменение данных\n Пользователь ${user.real_name_telegram}\nid-${user.chatId}-id`,
             {
                 reply_markup: {
                     inline_keyboard: [
                         [
                             {
-                                "text": "Открыть доступ",
+                                "text": "Открыть доступ к ЧатБоту по сну",
                                 "callback_data": "open_dream_new_user"
                             }
                         ]
                     ]
                 }
             })
-        await ctx.telegram.sendMessage(user.chatId, `${user.real_name_telegram}\nВам доступ открыт.\nПерегрузите, пожалуйста БОТ командой \/start`,
+        await ctx.telegram.sendMessage(5749279828, `Новая регистрация или изменение данных\n Пользователь ${user.real_name_telegram}\nid-${user.chatId}-id`,
             {
                 reply_markup: {
                     inline_keyboard: [
                         [
                             {
-                                "text": "Открыть доступ",
+                                "text": "Открыть доступ к ЧатБоту по сну",
                                 "callback_data": "open_dream_new_user"
                             }
                         ]
                     ]
                 }
             })
+        // await ctx.telegram.sendMessage(user.chatId, `${user.real_name_telegram}\nВам доступ открыт.\nПерегрузите, пожалуйста БОТ командой \/start`)
     } catch (e) {
         console.log(e)
     }
